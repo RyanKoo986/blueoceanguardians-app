@@ -1,0 +1,59 @@
+# Project Roadmap & Tasks
+
+- [x] Inspect existing project files and structure <!-- id: 0 -->
+- [x] Create missing configuration files (`package.json`, `index.html`, `vite.config.ts`, `tsconfig.json`) <!-- id: 1 -->
+- [x] Install required node dependencies (`npm install`) <!-- id: 2 -->
+- [x] Verify build and start dev server (`npm run dev`) <!-- id: 3 -->
+- [x] Clean up redundant web-crawler directories & duplicate nested folders <!-- id: 4 -->
+- [x] Simplify folder structure and update index.html CDN links <!-- id: 5 -->
+- [x] Remove outer redundant node_modules and flatten nested project folder structure <!-- id: 6 -->
+- [x] Create `schema.sql` for PostgreSQL database with schema isolation (`dokdo_guardians`), RLS policies, and seed data <!-- id: 7 -->
+- [x] Install `@supabase/supabase-js` and configure Supabase client (`src/lib/supabase.ts`) <!-- id: 8 -->
+- [x] Refactor `authService.ts` to use Supabase Auth and User Profiles <!-- id: 9 -->
+- [x] Refactor `archiveService.ts` for board posts, file storage, and comments via Supabase <!-- id: 10 -->
+- [x] Refactor `cleanupService.ts`, `contactService.ts`, and `reportService.ts` for Supabase CRUD operations <!-- id: 11 -->
+- [x] Verify build (`npm run build`) and test frontend integration <!-- id: 12 -->
+- [x] Document project architecture in `PROJECT.md` and environment variables in `.env.example` <!-- id: 13 -->
+- [x] Remove donation box banner from footer (`FooterSection.tsx`) <!-- id: 14 -->
+- [x] Implement Strategy A: Guest browse/submission mode, Admin role separation, and App Store compliant Account Deletion (`MyPage.tsx`, `authService.deleteAccount`) <!-- id: 15 -->
+- [x] Build OpenAI GPT-4o engine (`aiService.ts`) & interactive Fact-Check playground (`AIFactCheck.tsx`) <!-- id: 16 -->
+- [x] Implement complete standalone pages: `Contact.tsx`, `Contest.tsx`, `AdminDashboard.tsx` <!-- id: 17 -->
+- [x] Fix all dead CTA buttons & connect all router paths across the application <!-- id: 18 -->
+- [x] Verify production build (`npm run build`) and sync Capacitor mobile package (`npx cap sync`) <!-- id: 19 -->
+- [x] Mobile UI/UX polish: integrate mobile hamburger menu into header bar, remove isolated floating pill button, and fix Hero title clipping behind navigation <!-- id: 21 -->
+- [x] iPhone mobile viewport centering & layout alignment validation: safe-area viewport cover, responsive tabs, text scaling <!-- id: 22 -->
+- [x] Fix Hero scroll indicator centering: isolate animate-bounce from flexbox container, apply 100dvh height, add smooth scroll-to-next handler <!-- id: 23 -->
+- [x] Fix Scroll Down bottom anchoring: ensure explicit inline bottom positioning (`bottom: 2rem`) to prevent overlapping text content on mobile <!-- id: 24 -->
+- [x] Center Module A/B action buttons (Enter Contest, Start Correction) on mobile viewports for balanced layout <!-- id: 25 -->
+- [x] Generate and configure 3D Dokdo & Ocean brand app icons across all Android mipmap densities and web favicons <!-- id: 26 -->
+- [x] Apply App Store Rejection Prevention & Native Webview Touch Optimization (callout/drag/bounce elimination, safe selection) <!-- id: 27 -->
+- [x] Configure Android SDK path in `android/local.properties` (`sdk.dir`) <!-- id: 28 -->
+- [x] Remove Web Cookie Policy modal & button; retain App-compliant Privacy Policy (`FooterSection.tsx`) <!-- id: 29 -->
+- [x] Native Mobile App Shell Overhaul: Bottom Navigation Bar, Native App Header with Back (`<`) buttons, Safe-Area insets, scrollbar removal <!-- id: 30 -->
+- [x] Clean up AIFactCheck page: remove arbitrary mock presets & promotional cards; restore unified standard service layout <!-- id: 31 -->
+- [x] Configure AWS Amplify build specification (`amplify.yml`) for Vite SPA hosting <!-- id: 32 -->
+- [x] Responsive UI Polish & Optimization across Mobile, Tablet, and Desktop <!-- id: 33 -->
+  - [x] Align Navigation breakpoints across Header, BottomTabBar, and App layout <!-- id: 34 -->
+  - [x] Fix Hero Scroll Down indicator overlap with BottomTabBar on mobile <!-- id: 35 -->
+  - [x] Refactor Archive Write Modal and Notice Table for small mobile screens <!-- id: 36 -->
+  - [x] Adjust Sticky Breadcrumb top offsets to match responsive header height <!-- id: 37 -->
+  - [x] Optimize Contest Promo banner padding and button scaling <!-- id: 38 -->
+- [x] Fix Mobile Drawer Menu background transparency & header/bottom tab bar background styling <!-- id: 40 -->
+- [x] Eliminate legacy website-style breadcrumbs across all subpages for modern native app UX <!-- id: 41 -->
+- [x] Update Landing Hero background to Dokdo Aerial View (`dokdo-aerial-hero.jpg`) <!-- id: 42 -->
+- [x] Refine Top Header transparency overlay and restore vibrant icon readability in Bottom Tab Bar <!-- id: 43 -->
+- [x] Implement Dynamic Header: Pure Transparent at top to Crisp White Glass on scroll (`Header.tsx`) <!-- id: 44 -->
+- [x] Redesign Archive Tab Navigation into Modern Segmented Control & Clean Search UI (`archive/page.tsx`) <!-- id: 45 -->
+- [x] Polish Mobile Drawer Menu: Remove bulky submenu box, restore clean text list, unify Login/Signup buttons with crisp white text (`Header.tsx`) <!-- id: 46 -->
+- [x] Fix Home Hero bottom margin leakage and apply balanced vertical centering (`App.tsx`, `HeroSection.tsx`) <!-- id: 47 -->
+- [x] Fix Contest page hero banner text overlap with top fixed navigation header (`Contest.tsx`) <!-- id: 48 -->
+- [x] Dynamically switch bottom navigation bar 5th tab to '관리자' (Shield icon, `/admin`) when logged in as ADMIN (`BottomTabBar.tsx`) <!-- id: 49 -->
+- [x] Add Admin Control Center panel with 3 Quick Action buttons (Reports, Cleanup, Inquiries) to MyPage for ADMIN users (`MyPage.tsx`, `AdminDashboard.tsx`) <!-- id: 50 -->
+- [x] Polish AIFactCheck page layout: fix hero padding, refactor to modern responsive vertical card form, and eliminate narrow-screen layout squishing <!-- id: 53 -->
+- [x] Fix archive board separation: separate mock and live data by boardType (notice, dokdo, cleanup) so dokdo and cleanup tabs show distinct contents <!-- id: 54 -->
+- [x] Restrict notice board write permission exclusively to ADMIN accounts <!-- id: 55 -->
+- [x] Streamline BottomTabBar to 4 core tabs (Home, Cleanup, Archive, My/Admin) and remove standalone AI Fact Check tab <!-- id: 56 -->
+- [ ] Push Web + Mobile completed base to GitHub repository <!-- id: 20 -->
+
+
+
