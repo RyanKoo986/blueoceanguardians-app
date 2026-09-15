@@ -12,6 +12,8 @@
      GRANT ALL ON ALL SEQUENCES IN SCHEMA dokdo_guardians TO postgres, anon, authenticated, service_role;
      GRANT ALL ON ALL ROUTINES IN SCHEMA dokdo_guardians TO postgres, anon, authenticated, service_role;
      ```
-3. **Safe Resets & Storage Automation**:
+3. **Native UUID Standard (`gen_random_uuid()`)**:
+   - Always use native PostgreSQL built-in `gen_random_uuid()` instead of legacy `uuid_generate_v4()`. It requires no external extension (`uuid-ossp`) and works across all schema search paths without error.
+4. **Safe Resets & Storage Automation**:
    - Safe table drops using `DROP TABLE IF EXISTS ... CASCADE`.
    - Include Storage bucket initialization (`INSERT INTO storage.buckets ... ON CONFLICT DO UPDATE`) and storage RLS policies directly in `schema.sql`.
