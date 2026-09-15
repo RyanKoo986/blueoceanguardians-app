@@ -16,6 +16,7 @@
 - **Authentication & App Policy**:
   - **Guest Access**: All articles, research archive, fact checks, citizen error reports, and cleanup applications are accessible without forced login.
   - **Role-based Permissions**: `ADMIN` role for official archive posts, notice publishing, and report moderation.
+  - **App Store & Play Store Compliance (Privacy Policy)**: Dedicated standalone `/privacy` web route and modal in `FooterSection.tsx` compliant with Google Play Console and App Store guidelines.
   - **App Store Guideline 5.1.1(v) Compliance**: In-app permanent account deletion (`MyPage.tsx` -> `authService.deleteAccount`) provided for logged-in users.
   - **App Store Guideline 4.2 Compliance (Native Touch Optimization)**: Global suppression of web callouts (`-webkit-touch-callout: none`), bounce elimination (`overscroll-behavior-y: none`), tap highlight elimination, and selective text copying rules.
 
@@ -32,6 +33,11 @@ Custom schema `dokdo_guardians` is used for total isolation:
 - `dokdo_guardians.reports`: Citizen marine ecosystem / trash / hazard reports.
 - `dokdo_guardians.report_files`: Attached photo and GPS media for citizen reports.
 - `dokdo_guardians.contacts`: 1:1 user inquiries.
+
+### DDL & Security Principles:
+- **No `ALTER DEFAULT PRIVILEGES`**: Strictly prohibited to avoid unintended global privilege overrides across Supabase system (`auth`, `storage`) or other schemas.
+- **Explicit Direct `GRANT` Only**: Always grant permissions explicitly on the custom schema, its tables, sequences, and routines.
+- **Integrated Storage Initialization**: Storage bucket (`guardians-storage`) creation and storage RLS policies must be maintained directly within `schema.sql`.
 
 ---
 
