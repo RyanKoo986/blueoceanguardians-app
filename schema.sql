@@ -25,14 +25,11 @@ DROP TABLE IF EXISTS dokdo_guardians.archive_files CASCADE;
 DROP TABLE IF EXISTS dokdo_guardians.archive_posts CASCADE;
 DROP TABLE IF EXISTS dokdo_guardians.profiles CASCADE;
 
--- Enable UUID extension if not enabled
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- 3. Table Definitions
 
 -- [Profiles Table] 사용자 프로필 및 권한
 CREATE TABLE dokdo_guardians.profiles (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'USER' CHECK (role IN ('USER', 'ADMIN', 'RESEARCHER')),
@@ -47,7 +44,7 @@ CREATE TABLE dokdo_guardians.profiles (
 
 -- [Archive Posts] 독도 연구 자료, 보도자료, 활동 보고 게시글
 CREATE TABLE dokdo_guardians.archive_posts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     board_type TEXT NOT NULL CHECK (board_type IN ('research', 'press', 'notice', 'activity', 'default')),
     title TEXT NOT NULL,
     content TEXT NOT NULL,
@@ -63,7 +60,7 @@ CREATE TABLE dokdo_guardians.archive_posts (
 
 -- [Archive Files] 게시글 첨부 파일
 CREATE TABLE dokdo_guardians.archive_files (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     post_id UUID NOT NULL REFERENCES dokdo_guardians.archive_posts(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     filename TEXT NOT NULL,
@@ -74,7 +71,7 @@ CREATE TABLE dokdo_guardians.archive_files (
 
 -- [Archive Comments] 아카이브 게시글 댓글
 CREATE TABLE dokdo_guardians.archive_comments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     post_id UUID NOT NULL REFERENCES dokdo_guardians.archive_posts(id) ON DELETE CASCADE,
     author_id UUID REFERENCES dokdo_guardians.profiles(id) ON DELETE SET NULL,
     author_name TEXT NOT NULL,
@@ -85,7 +82,7 @@ CREATE TABLE dokdo_guardians.archive_comments (
 
 -- [Cleanup Requests] 해양 정화 활동 신청
 CREATE TABLE dokdo_guardians.cleanup_requests (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     contact TEXT NOT NULL,
     region TEXT,
@@ -96,7 +93,7 @@ CREATE TABLE dokdo_guardians.cleanup_requests (
 
 -- [Cleanup Files] 정화활동 신청 첨부파일
 CREATE TABLE dokdo_guardians.cleanup_files (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     cleanup_id UUID NOT NULL REFERENCES dokdo_guardians.cleanup_requests(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     filename TEXT NOT NULL,
@@ -107,7 +104,7 @@ CREATE TABLE dokdo_guardians.cleanup_files (
 
 -- [Reports] 해양 생태계 훼손 / 쓰레기 / 불법행위 제보
 CREATE TABLE dokdo_guardians.reports (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     url TEXT,
     description TEXT NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,
@@ -116,7 +113,7 @@ CREATE TABLE dokdo_guardians.reports (
 
 -- [Report Files] 제보 첨부 이미지 / 파일
 CREATE TABLE dokdo_guardians.report_files (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     report_id UUID NOT NULL REFERENCES dokdo_guardians.reports(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     filename TEXT NOT NULL,
@@ -127,7 +124,7 @@ CREATE TABLE dokdo_guardians.report_files (
 
 -- [Contacts] 1:1 문의사항
 CREATE TABLE dokdo_guardians.contacts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     email TEXT NOT NULL,
     message TEXT NOT NULL,
