@@ -3,6 +3,9 @@
 -- Database: PostgreSQL (Supabase Compatible)
 -- Schema: dokdo_guardians
 -- Description: 독도 및 해양 수호 활동, 아카이브, 정화활동 신청, 오염 제보, 회원 관리 스키마
+-- Security & DDL Rule:
+--   - ALWAYS use explicit direct GRANT statements on specific schema tables.
+--   - NEVER use ALTER DEFAULT PRIVILEGES to avoid unintended global permission overrides across other schemas.
 -- ==============================================================================
 
 -- 1. Custom Schema Isolation
@@ -170,7 +173,13 @@ CREATE POLICY "Allow public all on report_files" ON dokdo_guardians.report_files
 
 CREATE POLICY "Allow public all on contacts" ON dokdo_guardians.contacts FOR ALL USING (true);
 
--- 6. Initial Seed Data
+-- 6. Schema & Table Access Grants for Supabase API Roles (anon, authenticated, service_role)
+GRANT USAGE ON SCHEMA dokdo_guardians TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA dokdo_guardians TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA dokdo_guardians TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA dokdo_guardians TO postgres, anon, authenticated, service_role;
+
+-- 7. Initial Seed Data
 INSERT INTO dokdo_guardians.profiles (id, email, name, role, affiliation, license_grade)
 VALUES 
     ('00000000-0000-0000-0000-000000000001', 'admin@blueoceanguardians.org', '관리자', 'ADMIN', '블루오션 가디언스 본부', '마스터'),
@@ -216,4 +225,21 @@ VALUES
         '이번 정화 활동에 연구소 팀원들과 함께 신청 완료했습니다!'
     )
 ON CONFLICT (id) DO NOTHING;
+
+-- 8. Supabase Storage Bucket Initialization ('guardians-storage')
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('guardians-storage', 'guardians-storage', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Storage Policies (Safe Recreation)
+DROP POLICY IF EXISTS "Public Storage Access on guardians-storage" ON storage.objects;
+DROP POLICY IF EXISTS "Allow Uploads on guardians-storage" ON storage.objects;
+DROP POLICY IF EXISTS "Allow Updates on guardians-storage" ON storage.objects;
+DROP POLICY IF EXISTS "Allow Deletes on guardians-storage" ON storage.objects;
+
+CREATE POLICY "Public Storage Access on guardians-storage" ON storage.objects FOR SELECT USING (bucket_id = 'guardians-storage');
+CREATE POLICY "Allow Uploads on guardians-storage" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'guardians-storage');
+CREATE POLICY "Allow Updates on guardians-storage" ON storage.objects FOR UPDATE USING (bucket_id = 'guardians-storage');
+CREATE POLICY "Allow Deletes on guardians-storage" ON storage.objects FOR DELETE USING (bucket_id = 'guardians-storage');
+
 

@@ -15,6 +15,7 @@ const MyPage = lazy(() => import('../pages/MyPage'));
 const Contact = lazy(() => import('../pages/Contact'));
 const Contest = lazy(() => import('../pages/services/Contest'));
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
+const PrivacyPage = lazy(() => import('../pages/Privacy'));
 
 // Fallback component for missing pages
 const PlaceholderPage = () => (
@@ -121,6 +122,14 @@ const routes: RouteObject[] = [
     element: (
       <Suspense fallback={<LoadingFallback />}>
         <Contact />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/privacy',
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <PrivacyPage />
       </Suspense>
     ),
   },
