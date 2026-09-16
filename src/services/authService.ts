@@ -6,7 +6,8 @@ const CURRENT_USER_KEY = 'dokdo_current_user';
 export const authService = {
   // 로그인
   async login(credentials: LoginCredentials): Promise<User> {
-    const loginEmail = credentials.email || (credentials.id ? `${credentials.id}@guardians.org` : '');
+    const rawId = (credentials.email || credentials.id || '').trim();
+    const loginEmail = rawId.includes('@') ? rawId : (rawId ? `${rawId}@guardians.org` : '');
     const password = credentials.password || '';
 
     if (isSupabaseConfigured && supabase) {
@@ -48,7 +49,7 @@ export const authService = {
     if (!password) {
       throw new Error('비밀번호를 입력해주세요.');
     }
-    const isAdminUser = credentials.id === 'admin' || loginEmail.startsWith('admin@');
+    const isAdminUser = rawId === 'admin' || loginEmail.includes('admin');
     const demoUser: User = {
       id: isAdminUser ? 'admin' : 'demo-user-id',
       email: loginEmail || (isAdminUser ? 'admin@blueoceanguardians.org' : 'user@example.com'),
@@ -61,7 +62,8 @@ export const authService = {
 
   // 회원가입
   async signup(credentials: SignupCredentials): Promise<User> {
-    const email = credentials.email || (credentials.id ? `${credentials.id}@guardians.org` : '');
+    const rawId = (credentials.email || credentials.id || '').trim();
+    const email = rawId.includes('@') ? rawId : (rawId ? `${rawId}@guardians.org` : '');
     const password = credentials.password || 'password123';
 
     if (isSupabaseConfigured && supabase) {

@@ -186,53 +186,57 @@ export default function MyPage() {
           </div>
         )}
 
-        {/* Profile Info Details */}
-        <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 backdrop-blur-md">
-          <h2 className="text-lg font-bold text-white border-b border-white/10 pb-3 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-blue-400" />
-            {user.role === 'ADMIN' ? '관리자 계정 정보' : '내 프로필 정보'}
-          </h2>
+        {/* Profile Info Details (Only for General Users/Researchers) */}
+        {user.role !== 'ADMIN' && (
+          <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 backdrop-blur-md">
+            <h2 className="text-lg font-bold text-white border-b border-white/10 pb-3 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-blue-400" />
+              내 프로필 정보
+            </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 space-y-1">
-              <span className="text-gray-400 text-xs flex items-center gap-1.5">
-                <Award className="w-3.5 h-3.5 text-cyan-400" />
-                소속 / 직책
-              </span>
-              <p className="text-gray-200 font-medium">{user.affiliation || '미입력'}</p>
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 space-y-1">
+                <span className="text-gray-400 text-xs flex items-center gap-1.5">
+                  <Award className="w-3.5 h-3.5 text-cyan-400" />
+                  소속 / 직책
+                </span>
+                <p className="text-gray-200 font-medium">{user.affiliation || '미입력'}</p>
+              </div>
 
-            <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 space-y-1">
-              <span className="text-gray-400 text-xs flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-cyan-400" />
-                잠수 자격 등급
-              </span>
-              <p className="text-gray-200 font-medium">{user.licenseGrade || '미입력'}</p>
-            </div>
+              <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 space-y-1">
+                <span className="text-gray-400 text-xs flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-cyan-400" />
+                  잠수 자격 등급
+                </span>
+                <p className="text-gray-200 font-medium">{user.licenseGrade || '미입력'}</p>
+              </div>
 
-            <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 space-y-1">
-              <span className="text-gray-400 text-xs flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-cyan-400" />
-                연락처
-              </span>
-              <p className="text-gray-200 font-medium">{user.phone || '미입력'}</p>
-            </div>
+              <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 space-y-1">
+                <span className="text-gray-400 text-xs flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-cyan-400" />
+                  연락처
+                </span>
+                <p className="text-gray-200 font-medium">{user.phone || '미입력'}</p>
+              </div>
 
-            <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 space-y-1">
-              <span className="text-gray-400 text-xs flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                활동 지역
-              </span>
-              <p className="text-gray-200 font-medium">{user.address || '미입력'}</p>
+              <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 space-y-1">
+                <span className="text-gray-400 text-xs flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                  활동 지역
+                </span>
+                <p className="text-gray-200 font-medium">{user.address || '미입력'}</p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Account Actions */}
         <div className="bg-slate-800/40 border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
             <h3 className="text-sm font-semibold text-gray-200">계정 관리</h3>
-            <p className="text-xs text-gray-400 mt-0.5">안전하게 로그아웃하거나 계정 탈퇴를 진행할 수 있습니다.</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {user.role === 'ADMIN' ? '안전하게 로그아웃할 수 있습니다.' : '안전하게 로그아웃하거나 계정 탈퇴를 진행할 수 있습니다.'}
+            </p>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -246,13 +250,15 @@ export default function MyPage() {
               <LogOut className="w-4 h-4" />
               로그아웃
             </button>
-            <button
-              onClick={() => setShowDeleteModal(true)}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-700/40 transition"
-            >
-              <Trash2 className="w-4 h-4" />
-              회원 탈퇴
-            </button>
+            {user.role !== 'ADMIN' && (
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-700/40 transition"
+              >
+                <Trash2 className="w-4 h-4" />
+                회원 탈퇴
+              </button>
+            )}
           </div>
         </div>
       </div>
