@@ -808,8 +808,8 @@ export default function ArchivePage() {
                   <button
                     type="button"
                     onClick={() => handleAIGenerate('fact-check')}
-                    disabled={isGenerating || !writeForm.content.trim()}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 text-white font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer shrink-0"
+                    disabled={isGenerating}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer shrink-0 disabled:opacity-60"
                   >
                     {isGenerating ? (
                       <>

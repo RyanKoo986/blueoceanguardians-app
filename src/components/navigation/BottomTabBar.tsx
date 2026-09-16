@@ -19,7 +19,7 @@ export function BottomTabBar() {
     isAdmin || 
     user?.role === 'ADMIN' || 
     user?.id === 'admin' || 
-    (user?.email && user.email.toLowerCase().startsWith('admin'))
+    (user?.email && user.email.toLowerCase().includes('admin'))
   );
 
   const tabs: TabItem[] = [

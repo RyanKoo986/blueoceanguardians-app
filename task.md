@@ -55,7 +55,7 @@
 - [x] Streamline BottomTabBar to 4 core tabs (Home, Cleanup, Archive, My/Admin) and remove standalone AI Fact Check tab <!-- id: 56 -->
 - [x] Implement standalone Privacy Policy page (`/privacy`) for Google Play Store submission compliance (`Privacy.tsx`, `router/config.tsx`) <!-- id: 57 -->
 - [x] Document Android vs iOS Mobile Deployment comparison guide (`MOBILE_DEPLOYMENT_GUIDE.md`) <!-- id: 58 -->
-- [x] Enforce strict Database DDL security rules: eliminate `ALTER DEFAULT PRIVILEGES`, apply explicit schema-level `GRANT`s, and integrate storage automation (`schema.sql`, `PROJECT.md`, `.agents/rules/database.md`) <!-- id: 59 -->
+- [x] Fix login & signup email parsing to correctly support full custom email addresses (`authService.ts`, `BottomTabBar.tsx`) <!-- id: 60 -->
 - [ ] Push Web + Mobile completed base to GitHub repository <!-- id: 20 -->
 
 
