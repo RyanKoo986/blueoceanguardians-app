@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Shield, Award, Phone, MapPin, LogOut, Trash2, AlertTriangle, MessageSquare, Waves, ChevronRight } from 'lucide-react';
+import { User, Mail, Shield, Award, Phone, MapPin, LogOut, Trash2, AlertTriangle, MessageSquare, Waves, ChevronRight, Fingerprint, Scan } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { biometricService } from '../services/biometricService';
 
 export default function MyPage() {
   const { user, isAuthenticated, logout, deleteAccount } = useAuth();
@@ -10,6 +11,28 @@ export default function MyPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [bioEnabled, setBioEnabled] = useState(false);
+  const [bioType, setBioType] = useState<'fingerprint' | 'face' | 'biometrics'>('fingerprint');
+
+  React.useEffect(() => {
+    biometricService.checkAvailability().then((status) => {
+      setBioEnabled(status.isEnabled);
+      setBioType(status.biometryType as any);
+    });
+  }, []);
+
+  const handleToggleBiometric = async () => {
+    if (!user) return;
+    if (bioEnabled) {
+      biometricService.disableBiometric();
+      setBioEnabled(false);
+    } else {
+      const success = await biometricService.enableBiometric(user);
+      if (success) {
+        setBioEnabled(true);
+      }
+    }
+  };
 
   if (!isAuthenticated || !user) {
     return (
@@ -229,6 +252,48 @@ export default function MyPage() {
             </div>
           </div>
         )}
+
+        {/* Security & Biometric Login Settings */}
+        <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-6 sm:p-8 backdrop-blur-md">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0 mt-0.5">
+                {bioType === 'face' ? (
+                  <Scan className="w-5 h-5" />
+                ) : (
+                  <Fingerprint className="w-5 h-5" />
+                )}
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  생체 인증 간편 로그인
+                  {bioEnabled && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold">
+                      사용 중
+                    </span>
+                  )}
+                </h3>
+                <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                  스마트폰의 {bioType === 'face' ? 'Face ID' : '지문 센서'}를 사용하여 비밀번호 없이 즉시 로그인합니다.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleToggleBiometric}
+              className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none self-end sm:self-center ${
+                bioEnabled ? 'bg-cyan-500' : 'bg-gray-700'
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  bioEnabled ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
 
         {/* Account Actions */}
         <div className="bg-slate-800/40 border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">

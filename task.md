@@ -56,6 +56,9 @@
 - [x] Implement standalone Privacy Policy page (`/privacy`) for Google Play Store submission compliance (`Privacy.tsx`, `router/config.tsx`) <!-- id: 57 -->
 - [x] Document Android vs iOS Mobile Deployment comparison guide (`MOBILE_DEPLOYMENT_GUIDE.md`) <!-- id: 58 -->
 - [x] Fix login & signup email parsing to correctly support full custom email addresses (`authService.ts`, `BottomTabBar.tsx`) <!-- id: 60 -->
+- [x] Implement Biometric Authentication (Fingerprint & Face ID) quick login, auto-registration modal, and MyPage toggle switch (`biometricService.ts`, `Login.tsx`, `MyPage.tsx`) <!-- id: 61 -->
+- [x] Implement Supabase Auth Password Reset email workflow and dedicated reset page (`authService.ts`, `Login.tsx`, `ResetPassword.tsx`, `router/config.tsx`) <!-- id: 62 -->
+- [x] Streamline Signup form: unify ID with Email, add Email duplicate check, remove redundant address field, and make diver fields optional (`Signup.tsx`, `authService.ts`) <!-- id: 63 -->
 - [ ] Push Web + Mobile completed base to GitHub repository <!-- id: 20 -->
 
 
