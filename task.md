@@ -59,6 +59,7 @@
 - [x] Implement Biometric Authentication (Fingerprint & Face ID) quick login, auto-registration modal, and MyPage toggle switch (`biometricService.ts`, `Login.tsx`, `MyPage.tsx`) <!-- id: 61 -->
 - [x] Implement Supabase Auth Password Reset email workflow and dedicated reset page (`authService.ts`, `Login.tsx`, `ResetPassword.tsx`, `router/config.tsx`) <!-- id: 62 -->
 - [x] Streamline Signup form: unify ID with Email, add Email duplicate check, remove redundant address field, and make diver fields optional (`Signup.tsx`, `authService.ts`) <!-- id: 63 -->
+- [x] Fix archive post edit bugs: allow admin editing, preserve category & files, and support fallback updates for demo posts (`archiveService.ts`, `archive/page.tsx`) <!-- id: 64 -->
 - [ ] Push Web + Mobile completed base to GitHub repository <!-- id: 20 -->
 
 
