@@ -14,6 +14,7 @@
 - **Mobile Packaging (Target)**: Capacitor (`@capacitor/core`, `@capacitor/android`, `@capacitor/ios`)
 - **AI Engine (GPT-4o)**: OpenAI GPT-4o (`aiService.ts`) for real-time historical fact-checking, distortion correction, text refinement, and summarization with offline fallback.
 - **Authentication & App Policy**:
+  - **Biometric Quick Login**: Native Fingerprint & Face ID authentication (`biometricService.ts`) with seamless WebAuthn support and one-click auto-registration.
   - **Guest Access**: All articles, research archive, fact checks, citizen error reports, and cleanup applications are accessible without forced login.
   - **Role-based Permissions**: `ADMIN` role for official archive posts, notice publishing, and report moderation.
   - **App Store & Play Store Compliance (Privacy Policy)**: Dedicated standalone `/privacy` web route and modal in `FooterSection.tsx` compliant with Google Play Console and App Store guidelines.

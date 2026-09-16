@@ -198,19 +198,8 @@ function Header() {
                   {getPageTitle(location.pathname)}
                 </h1>
 
-                {/* Subpage Right: Home / Menu */}
+                {/* Subpage Right: Menu */}
                 <div className="flex items-center gap-1">
-                  <Link
-                    to="/"
-                    className={`p-2 rounded-xl active:scale-90 transition-all ${
-                      isHeaderWhite 
-                        ? "text-gray-800 hover:bg-gray-100" 
-                        : "text-white hover:bg-white/10"
-                    }`}
-                    aria-label="홈으로 이동"
-                  >
-                    <Home size={20} color={isHeaderWhite ? "#111827" : "#ffffff"} />
-                  </Link>
                   <button
                     type="button"
                     onClick={toggleMenu}

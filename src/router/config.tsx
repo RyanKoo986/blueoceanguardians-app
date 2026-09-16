@@ -16,6 +16,7 @@ const Contact = lazy(() => import('../pages/Contact'));
 const Contest = lazy(() => import('../pages/services/Contest'));
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
 const PrivacyPage = lazy(() => import('../pages/Privacy'));
+const ResetPassword = lazy(() => import('../pages/ResetPassword'));
 
 // Fallback component for missing pages
 const PlaceholderPage = () => (
@@ -58,6 +59,14 @@ const routes: RouteObject[] = [
     element: (
       <Suspense fallback={<LoadingFallback />}>
         <Signup />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/reset-password',
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <ResetPassword />
       </Suspense>
     ),
   },

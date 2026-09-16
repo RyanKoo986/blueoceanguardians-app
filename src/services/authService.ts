@@ -60,6 +60,32 @@ export const authService = {
     return demoUser;
   },
 
+  // 이메일 중복 확인
+  async checkEmailExists(email: string): Promise<boolean> {
+    const cleanEmail = email.trim();
+    if (!cleanEmail) return false;
+
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', cleanEmail)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('Error checking email duplicate:', error);
+        return false;
+      }
+      return Boolean(data);
+    }
+
+    // 로컬/데모 환경: dokdo_current_user 또는 데모 관리자 이메일 확인
+    const current = this.getCurrentUser();
+    if (current && current.email === cleanEmail) return true;
+    if (cleanEmail === 'admin@blueoceanguardians.org' || cleanEmail === 'dokdo-admin@sol.com') return true;
+    return false;
+  },
+
   // 회원가입
   async signup(credentials: SignupCredentials): Promise<User> {
     const rawId = (credentials.email || credentials.id || '').trim();
@@ -216,6 +242,48 @@ export const authService = {
       await supabase.auth.signOut().catch(() => {});
     }
     localStorage.removeItem(CURRENT_USER_KEY);
+  },
+
+  // 비밀번호 재설정 이메일 발송
+  async resetPassword(email: string): Promise<void> {
+    const cleanEmail = email.trim();
+    const fullEmail = cleanEmail.includes('@') ? cleanEmail : `${cleanEmail}@guardians.org`;
+
+    if (isSupabaseConfigured && supabase) {
+      const redirectUrl = `${window.location.origin}/reset-password`;
+      const { error } = await supabase.auth.resetPasswordForEmail(fullEmail, {
+        redirectTo: redirectUrl,
+      });
+
+      if (error) {
+        throw new Error(error.message || '비밀번호 재설정 이메일 발송에 실패했습니다.');
+      }
+      return;
+    }
+
+    // 로컬/데모 환경 폴백
+    console.log(`[Demo Auth] Password reset link sent to: ${fullEmail}`);
+  },
+
+  // 새 비밀번호로 업데이트
+  async updatePassword(newPassword: string): Promise<void> {
+    if (!newPassword || newPassword.length < 6) {
+      throw new Error('비밀번호는 최소 6자리 이상이어야 합니다.');
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) {
+        throw new Error(error.message || '비밀번호 변경에 실패했습니다.');
+      }
+      return;
+    }
+
+    // 로컬/데모 환경 폴백
+    console.log('[Demo Auth] Password updated successfully in demo mode');
   },
 };
 
