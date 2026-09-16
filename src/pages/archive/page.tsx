@@ -185,6 +185,7 @@ export default function ArchivePage() {
       authorId: post.authorId,
       authorName: post.authorName,
       visibility: post.visibility,
+      category: post.category,
       files: []
     });
     setEditingPostId(post.id);
@@ -207,15 +208,18 @@ export default function ArchivePage() {
     try {
       if (editingPostId) {
         await archiveService.updatePost(activeTab, editingPostId, {
-          ...writeForm,
-          authorId: user?.id || ''
+          title: writeForm.title.trim(),
+          content: writeForm.content.trim(),
+          visibility: writeForm.visibility,
+          category: writeForm.category,
+          files: writeForm.files,
         });
         alert('게시글이 수정되었습니다.');
       } else {
         const result = await archiveService.createPost(activeTab, {
           ...writeForm,
           authorId: user?.id || '',
-          authorName: (user as any)?.nickname || user?.id || ''
+          authorName: (user as any)?.nickname || user?.name || user?.id || '가디언즈 회원'
         });
         setCreatedPost(result);
         setShowShareModal(true);
@@ -227,7 +231,7 @@ export default function ArchivePage() {
         title: '',
         content: '',
         authorId: user?.id || '',
-        authorName: (user as any)?.nickname || user?.id || '',
+        authorName: (user as any)?.nickname || user?.name || user?.id || '',
         visibility: 'public',
         files: []
       });
@@ -1034,7 +1038,7 @@ export default function ArchivePage() {
                    </button>
                    
                    <div className="flex gap-2">
-                     {selectedPost.authorId === user?.id && (
+                      {(selectedPost.authorId === user?.id || isAdmin) && (
                        <button
                          onClick={() => handleEdit(selectedPost)}
                          className="flex items-center gap-1 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors font-medium text-sm"

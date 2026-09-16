@@ -415,14 +415,16 @@ export const archiveService = {
     id: string,
     data: Partial<CreatePostData>,
   ): Promise<ArchivePost> {
-    if (isSupabaseConfigured && supabase) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    if (isSupabaseConfigured && supabase && isUuid) {
       const updatePayload: Record<string, any> = {
         updated_at: new Date().toISOString(),
       };
-      if (data.title) updatePayload.title = data.title;
-      if (data.content) updatePayload.content = data.content;
-      if (data.visibility) updatePayload.visibility = data.visibility;
-      if (data.category) updatePayload.category = data.category;
+      if (data.title !== undefined) updatePayload.title = data.title;
+      if (data.content !== undefined) updatePayload.content = data.content;
+      if (data.visibility !== undefined) updatePayload.visibility = data.visibility;
+      if (data.category !== undefined) updatePayload.category = data.category;
 
       const { data: updated, error } = await supabase
         .from('archive_posts')
@@ -431,28 +433,67 @@ export const archiveService = {
         .select()
         .single();
 
-      if (error || !updated) {
-        throw new Error(error?.message || '게시글 수정에 실패했습니다.');
+      if (!error && updated) {
+        // 새 파일이 추가된 경우 업로드 처리
+        if (data.files && data.files.length > 0) {
+          for (const file of data.files) {
+            const filePath = `archive/${id}/${Date.now()}_${file.name}`;
+            const { error: uploadErr } = await supabase.storage
+              .from(STORAGE_BUCKET)
+              .upload(filePath, file);
+
+            if (!uploadErr) {
+              const { data: urlData } = supabase.storage
+                .from(STORAGE_BUCKET)
+                .getPublicUrl(filePath);
+
+              await supabase.from('archive_files').insert({
+                post_id: id,
+                name: file.name,
+                filename: filePath,
+                size: file.size,
+                url: urlData.publicUrl,
+              });
+            }
+          }
+        }
+
+        return this.getPost(boardType, id);
       }
-      return this.getPost(boardType, id);
     }
 
+    // 로컬 글 또는 Supabase 폴백
     const posts = getLocalPosts();
     const index = posts.findIndex((p) => p.id === id);
-    if (index === -1) throw new Error('게시글을 찾을 수 없습니다.');
-    const { files: _, ...restData } = data;
-    posts[index] = { ...posts[index], ...restData, updatedAt: new Date().toISOString() };
-    saveLocalPosts(posts);
-    return posts[index];
+    if (index !== -1) {
+      const { files: newFiles, ...restData } = data;
+      const existingFiles = posts[index].files || [];
+      const addedFiles = (newFiles || []).map((f) => ({
+        name: f.name,
+        filename: f.name,
+        size: f.size,
+        url: URL.createObjectURL(f),
+      }));
+
+      posts[index] = {
+        ...posts[index],
+        ...restData,
+        files: [...existingFiles, ...addedFiles],
+        updatedAt: new Date().toISOString(),
+      };
+      saveLocalPosts(posts);
+      return posts[index];
+    }
+
+    throw new Error('게시글을 찾을 수 없거나 수정에 실패했습니다.');
   },
 
   async deletePost(boardType: string, id: string, _userId?: string): Promise<void> {
-    if (isSupabaseConfigured && supabase) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    if (isSupabaseConfigured && supabase && isUuid) {
       const { error } = await supabase.from('archive_posts').delete().eq('id', id);
-      if (error) {
-        throw new Error(error.message || '게시글 삭제에 실패했습니다.');
-      }
-      return;
+      if (!error) return;
     }
 
     const posts = getLocalPosts().filter((p) => p.id !== id);
