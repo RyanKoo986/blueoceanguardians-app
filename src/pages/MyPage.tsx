@@ -254,10 +254,13 @@ export default function MyPage() {
         )}
 
         {/* Security & Biometric Login Settings */}
-        <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-6 sm:p-8 backdrop-blur-md">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-5 sm:p-7 backdrop-blur-md">
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                style={{ backgroundColor: 'rgba(6, 182, 212, 0.15)', color: '#22d3ee' }}
+              >
                 {bioType === 'face' ? (
                   <Scan className="w-5 h-5" />
                 ) : (
@@ -265,11 +268,29 @@ export default function MyPage() {
                 )}
               </div>
               <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <h3 className="text-base font-bold text-white flex items-center gap-2 flex-wrap">
                   생체 인증 간편 로그인
-                  {bioEnabled && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold">
+                  {bioEnabled ? (
+                    <span
+                      className="text-[10px] px-2 py-0.5 rounded-full font-semibold border"
+                      style={{
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        color: '#34d399',
+                        borderColor: 'rgba(16, 185, 129, 0.3)',
+                      }}
+                    >
                       사용 중
+                    </span>
+                  ) : (
+                    <span
+                      className="text-[10px] px-2 py-0.5 rounded-full font-semibold border"
+                      style={{
+                        backgroundColor: 'rgba(156, 163, 175, 0.2)',
+                        color: '#9ca3af',
+                        borderColor: 'rgba(156, 163, 175, 0.3)',
+                      }}
+                    >
+                      비활성
                     </span>
                   )}
                 </h3>
@@ -281,15 +302,25 @@ export default function MyPage() {
 
             <button
               type="button"
+              role="switch"
+              aria-checked={bioEnabled}
               onClick={handleToggleBiometric}
-              className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none self-end sm:self-center ${
-                bioEnabled ? 'bg-cyan-500' : 'bg-gray-700'
-              }`}
+              style={{
+                width: '52px',
+                height: '30px',
+                backgroundColor: bioEnabled ? '#06b6d4' : '#4b5563',
+                transition: 'background-color 0.25s ease',
+              }}
+              className="relative shrink-0 cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900"
             >
               <span
-                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                  bioEnabled ? 'translate-x-5' : 'translate-x-0'
-                }`}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  transform: bioEnabled ? 'translateX(22px)' : 'translateX(1px)',
+                  transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+                className="pointer-events-none block rounded-full bg-white shadow-md"
               />
             </button>
           </div>

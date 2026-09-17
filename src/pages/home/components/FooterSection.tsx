@@ -132,7 +132,8 @@ export function FooterSection() {
             onClick={() => setShowPrivacyModal(false)}
           >
             <motion.div
-              className="bg-slate-900 border border-white/20 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl"
+              className="bg-slate-900 border border-white/20 rounded-2xl w-full max-w-2xl overflow-y-auto shadow-2xl"
+              style={{ maxHeight: '85dvh', overscrollBehavior: 'contain' }}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}

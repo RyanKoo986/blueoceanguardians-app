@@ -33,6 +33,11 @@ export const aiService = {
                 role: 'system',
                 content: `당신은 대한민국 독도 및 동해 해양 역사·국제법 전문 AI 팩트체커입니다.
 입력된 문장에서 독도(Dokdo) 왜곡(예: 리앙쿠르 암초/Liancourt Rocks, 다케시마/Takeshima, 분쟁 지역 표기, 일본 영유권 주장 등)과 동해(East Sea) 왜곡(일본해 단독 표기 등)을 정밀 분석하세요.
+
+[핵심 검증 규칙]
+1. 독도나 동해에 관한 명백한 역사적·국제법적 오류 또는 왜곡 표현이 실제로 존재하는 경우에만 "issues" 배열에 추가하고, "correctedContent"에 교정본을 제공하세요.
+2. 왜곡 표현이 없거나, 일반적인 일상/환경/학술 글인 경우 텍스트를 임의로 수정하거나 꼬리말/요약문을 추가하지 마십시오. 반드시 "issues": [] (빈 배열)을 반환하고 "correctedContent"는 사용자의 입력 원문과 100% 동일하게 유지해야 합니다.
+
 반드시 아래 JSON 형식으로만 응답해야 합니다 (마크다운 코드블록 없이 순수 JSON):
 {
   "issues": [
@@ -41,8 +46,8 @@ export const aiService = {
       "reason": "역사적/국제법적 오류 이유 및 반박 근거 (대한제국 칙령 제41호, 샌프란시스코 강화조약 등)"
     }
   ],
-  "correctedContent": "왜곡이 완전히 교정된 올바른 완성형 문장 (한국어 및 주요 영문 병기)",
-  "explanation": "교정 전반에 대한 요약 해설"
+  "correctedContent": "교정된 완성형 문장 (오류가 없으면 원문 그대로)",
+  "explanation": "분석 요약 (오류가 없으면 '역사적 왜곡이나 오류가 발견되지 않은 안전한 서술입니다.')"
 }`,
               },
               {
@@ -50,7 +55,7 @@ export const aiService = {
                 content: content,
               },
             ],
-            temperature: 0.2,
+            temperature: 0.1,
             response_format: { type: 'json_object' },
           }),
         });
@@ -81,7 +86,7 @@ export const aiService = {
     }
 
     const systemPrompts = {
-      refine: '당신은 독도 및 해양 생태계 전문 에디터입니다. 입력된 글의 문맥과 가독성을 높이고 정중하고 설득력 있는 어조로 다듬어주세요.',
+      refine: '당신은 독도 및 해양 생태계 전문 에디터입니다. 원문의 고유한 내용과 사실을 해치지 않고 오탈자와 문맥, 가독성만을 깔끔하고 품격 있게 다듬어주세요.',
       expand: '당신은 해양 보전 전문가입니다. 입력된 글의 핵심 아이디어를 바탕으로 풍부한 배경 지식과 구체적인 설명을 더해 전문적인 글로 확장해주세요.',
       summarize: '당신은 문서 요약 전문가입니다. 핵심 사실과 중요 활동 내용을 3~4줄 내외로 명확하게 요약해주세요.',
     };
@@ -100,7 +105,7 @@ export const aiService = {
               { role: 'system', content: systemPrompts[mode] },
               { role: 'user', content },
             ],
-            temperature: 0.7,
+            temperature: 0.5,
           }),
         });
 
@@ -119,7 +124,7 @@ export const aiService = {
     } else if (mode === 'expand') {
       return `${content}\n\n[AI 학술 보완 내용 (GPT-4o)]\n독도는 역사적, 지리적, 국제법적으로 명백한 대한민국의 고유 영토이며, 1900년 대한제국 칙령 제41호에 의해 관할권이 명시되었습니다. 또한 천혜의 해양 생태계를 품고 있어 지속적인 수중 정화 및 해양 환경 모니터링이 필수적입니다.`;
     } else {
-      return `${content}\n\n(✨ GPT-4o 엔진으로 문체와 어조를 정돈하고 역사적 사실 기술의 정확도를 검증하였습니다.)`;
+      return content;
     }
   },
 
@@ -160,18 +165,14 @@ export const aiService = {
       corrected = corrected.replace(/sea\s*of\s*japan/gi, 'East Sea (동해)').replace(/일본해/gi, '동해(East Sea)');
     }
 
-    if (issues.length === 0) {
-      issues.push({
-        original: '표기 전반 검토',
-        reason: '독도 및 동해 표기가 사실에 부합하며 역사적 정통성을 잘 반영하고 있습니다.',
-      });
-      corrected = `${content}\n\n(검토 완료: 독도와 동해에 대한 올바른 역사적 지명이 적용되었습니다.)`;
-    }
+    const hasIssues = issues.length > 0;
 
     return {
       issues,
-      correctedContent: corrected,
-      explanation: 'GPT-4o 팩트체크 엔진이 역사적 문헌(대한제국 칙령 제41호, 삼국사기 등)과 국제 표준 표기법을 기준으로 왜곡 요소를 분석하고 올바른 지명으로 교정하였습니다.',
+      correctedContent: hasIssues ? corrected : content,
+      explanation: hasIssues
+        ? 'AI 팩트체크 엔진이 역사적 문헌(대한제국 칙령 제41호, 삼국사기 등)과 국제 표준 표기법을 기준으로 왜곡 요소를 분석하고 올바른 지명으로 교정하였습니다.'
+        : '본문에서 독도 및 동해에 대한 역사적 왜곡이나 오류 표현이 감지되지 않았습니다. 안전하고 올바른 서술입니다.',
     };
   },
 };
