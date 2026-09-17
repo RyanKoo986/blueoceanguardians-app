@@ -126,12 +126,12 @@ export function BottomTabBar() {
           exit={{ opacity: 0, y: 15, x: '-50%' }}
           transition={{ duration: 0.15 }}
           aria-label="하단 탭 네비게이션"
-          className="lg:hidden fixed z-40 bg-slate-900/90 backdrop-blur-xl border border-white/15 rounded-full p-1 shadow-[0_10px_30px_rgba(0,0,0,0.65)] flex items-center justify-between"
+          className="lg:hidden fixed z-40 bg-slate-900/95 backdrop-blur-2xl border border-white/20 rounded-full p-1 shadow-[0_12px_32px_rgba(0,0,0,0.75)] flex items-center justify-between"
           style={{
             position: 'fixed',
             bottom: 'max(env(safe-area-inset-bottom, 0px), 14px)',
             left: '50%',
-            width: 'min(72%, 290px)',
+            width: 'min(74%, 296px)',
             pointerEvents: 'auto',
             touchAction: 'manipulation',
           }}
@@ -161,7 +161,7 @@ export function BottomTabBar() {
                 {active && (
                   <motion.div
                     layoutId="activeBottomTabPill"
-                    className="absolute inset-0 bg-blue-600/35 border border-blue-400/40 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.4)] -z-10"
+                    className="absolute inset-0 bg-blue-600/40 border border-cyan-400/50 rounded-full shadow-[0_0_12px_rgba(6,182,212,0.4)] -z-10"
                     transition={{ type: 'spring', stiffness: 450, damping: 35 }}
                   />
                 )}
@@ -169,11 +169,11 @@ export function BottomTabBar() {
                 <div className="relative flex items-center justify-center pointer-events-none">
                   <IconComponent 
                     size={16} 
-                    strokeWidth={active ? 2.4 : 1.8} 
+                    strokeWidth={active ? 2.4 : 2} 
                     className={`transition-all duration-200 ${
                       active 
-                        ? 'text-blue-400 scale-105 drop-shadow-[0_0_6px_rgba(96,165,250,0.6)]' 
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'text-cyan-300 scale-105 drop-shadow-[0_0_6px_rgba(34,211,238,0.7)]' 
+                        : 'text-slate-300 hover:text-white'
                     }`}
                   />
                 </div>
@@ -181,8 +181,8 @@ export function BottomTabBar() {
                 <span 
                   className={`text-[9.5px] mt-0.5 tracking-tight leading-none pointer-events-none transition-colors duration-200 ${
                     active 
-                      ? 'font-bold text-blue-300' 
-                      : 'font-medium text-slate-400'
+                      ? 'font-bold text-cyan-200' 
+                      : 'font-medium text-slate-200'
                   }`}
                 >
                   {tab.label}

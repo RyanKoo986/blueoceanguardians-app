@@ -372,13 +372,23 @@ export default function ArchivePage() {
     if (endPage < totalPages) setCurrentPage(endPage + 1);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '-';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
     }).replace(/\./g, '.').replace(/\s/g, '');
+  };
+
+  const isPostEdited = (createdAt?: string, updatedAt?: string) => {
+    if (!createdAt || !updatedAt) return false;
+    const createdTime = new Date(createdAt).getTime();
+    const updatedTime = new Date(updatedAt).getTime();
+    if (isNaN(createdTime) || isNaN(updatedTime)) return false;
+    return updatedTime - createdTime > 60 * 1000;
   };
 
   return (
@@ -943,45 +953,63 @@ export default function ArchivePage() {
                 <div className="border-t-2 border-slate-800 border-b border-gray-200">
                   
                   {/* Title Area */}
-                  <div className="bg-gray-50 px-4 sm:px-6 py-3.5 sm:py-5 border-b border-gray-200">
+                  <div className="bg-gray-50 px-4 sm:px-6 py-3.5 sm:py-5 border-b border-gray-200 flex items-start justify-between gap-3">
                     <h1 className="text-lg sm:text-2xl font-bold text-gray-900 leading-snug">
                        {selectedPost.title}
                     </h1>
+                    {selectedPost.visibility === 'private' ? (
+                       <span className="shrink-0 flex items-center gap-1 text-gray-500 text-xs border border-gray-300 rounded px-2 py-0.5 bg-white font-medium">
+                          <Lock size={12} /> 비공개
+                       </span>
+                    ) : (
+                       <span className="shrink-0 flex items-center gap-1 text-blue-600 text-xs border border-blue-200 rounded px-2 py-0.5 bg-blue-50 font-medium">
+                          <Globe size={12} /> 전체공개
+                       </span>
+                    )}
                   </div>
 
-                  {/* Info Row: Author | Date | Views */}
-                  <div className="flex flex-wrap border-b border-gray-200 text-xs sm:text-sm">
-                     <div className="w-1/2 md:w-auto flex items-center">
-                        <span className="w-16 sm:w-20 bg-gray-50 py-2.5 sm:py-3 text-center font-bold text-gray-600 border-r border-gray-200">작성자</span>
-                        <span className="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-800 truncate">
+                  {/* Info Row: 2x2 Balanced Grid */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 border-b border-gray-200 text-xs sm:text-sm">
+                     {/* Row 1, Col 1: 작성자 */}
+                     <div className="flex items-center border-b md:border-b-0 border-r border-gray-200">
+                        <span className="w-16 sm:w-20 bg-gray-50 py-2.5 sm:py-3 text-center font-bold text-gray-600 border-r border-gray-200 shrink-0">
+                          작성자
+                        </span>
+                        <span className="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-800 truncate font-medium">
                            {selectedPost.authorName}
                         </span>
                      </div>
-                     <div className="w-1/2 md:w-auto flex items-center md:border-l border-gray-200">
-                        <span className="w-16 sm:w-20 bg-gray-50 py-2.5 sm:py-3 text-center font-bold text-gray-600 border-r border-gray-200">등록일</span>
+
+                     {/* Row 1, Col 2: 등록일 */}
+                     <div className="flex items-center border-b md:border-b-0 md:border-r border-gray-200">
+                        <span className="w-16 sm:w-20 bg-gray-50 py-2.5 sm:py-3 text-center font-bold text-gray-600 border-r border-gray-200 shrink-0">
+                          등록일
+                        </span>
                         <span className="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-600 whitespace-nowrap">
                            {formatDate(selectedPost.createdAt)}
                         </span>
                      </div>
-                     {(isAdmin || (activeTab !== 'notice' && selectedPost.authorId === user?.id)) && (
-                       <div className="w-1/2 md:w-auto flex items-center md:border-l border-gray-200">
-                          <span className="w-16 sm:w-20 bg-gray-50 py-2.5 sm:py-3 text-center font-bold text-gray-600 border-r border-gray-200">조회수</span>
-                          <span className="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-600">
-                             {selectedPost.views.toLocaleString()}
-                          </span>
-                       </div>
-                     )}
-                     <div className="w-full md:w-auto md:ml-auto md:border-l border-gray-200 flex items-center px-4 py-2 gap-2 bg-gray-50 md:bg-transparent justify-end">
-                        {selectedPost.visibility === 'private' && (
-                           <span className="flex items-center gap-1 text-gray-500 text-xs border border-gray-300 rounded px-2 py-0.5 bg-white">
-                              <Lock size={12} /> 비공개
-                           </span>
-                        )}
-                        {selectedPost.visibility === 'public' && (
-                           <span className="flex items-center gap-1 text-blue-600 text-xs border border-blue-200 rounded px-2 py-0.5 bg-blue-50">
-                              <Globe size={12} /> 전체공개
-                           </span>
-                        )}
+
+                     {/* Row 2, Col 1: 조회수 */}
+                     <div className="flex items-center border-r border-gray-200">
+                        <span className="w-16 sm:w-20 bg-gray-50 py-2.5 sm:py-3 text-center font-bold text-gray-600 border-r border-gray-200 shrink-0">
+                          조회수
+                        </span>
+                        <span className="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-600">
+                           {selectedPost.views.toLocaleString()}
+                        </span>
+                     </div>
+
+                     {/* Row 2, Col 2: 수정일 (등록일 바로 아래 정렬) */}
+                     <div className="flex items-center">
+                        <span className="w-16 sm:w-20 bg-gray-50 py-2.5 sm:py-3 text-center font-bold text-gray-600 border-r border-gray-200 shrink-0">
+                          수정일
+                        </span>
+                        <span className="px-3 sm:px-4 py-2.5 sm:py-3 text-gray-600 whitespace-nowrap">
+                           {isPostEdited(selectedPost.createdAt, selectedPost.updatedAt)
+                             ? formatDate(selectedPost.updatedAt)
+                             : '-'}
+                        </span>
                      </div>
                   </div>
 

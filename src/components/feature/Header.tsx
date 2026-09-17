@@ -8,7 +8,16 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const isLightPage = ['/contact', '/login', '/signup', '/mypage'].includes(location.pathname) || location.pathname.startsWith('/admin');
+  const isLightPage = [
+    '/contact',
+    '/login',
+    '/signup',
+    '/reset-password',
+    '/services/cleanup',
+    '/services/contest',
+    '/services/ai-fact-check',
+    '/services/report',
+  ].some((path) => location.pathname === path || location.pathname.startsWith(path));
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
@@ -108,7 +117,7 @@ function Header() {
     },
   ];
 
-  const isHeaderWhite = isScrolled || isLightPage;
+  const isHeaderWhite = isLightPage;
 
   return (
     <>
@@ -116,18 +125,19 @@ function Header() {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
           isHeaderWhite
             ? "border-gray-200 shadow-sm"
+            : isScrolled
+            ? "border-white/10 shadow-lg"
             : "border-transparent"
         }`}
         style={{
           paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)',
           backgroundColor: isHeaderWhite
             ? 'rgba(255, 255, 255, 0.96)'
-            : 'transparent',
-          backdropFilter: isHeaderWhite ? 'blur(16px)' : 'none',
-          WebkitBackdropFilter: isHeaderWhite ? 'blur(16px)' : 'none',
-          backgroundImage: !isHeaderWhite
-            ? 'linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 100%)'
-            : 'none',
+            : isScrolled
+            ? 'rgba(2, 6, 23, 0.88)'
+            : 'rgba(2, 6, 23, 0.45)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
