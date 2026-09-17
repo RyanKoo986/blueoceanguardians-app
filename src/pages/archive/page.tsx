@@ -694,7 +694,8 @@ export default function ArchivePage() {
             onClick={() => setShowWriteModal(false)}
           >
             <motion.div
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-gray-200"
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-y-auto border border-gray-200"
+              style={{ maxHeight: '85dvh', overscrollBehavior: 'contain' }}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -916,7 +917,8 @@ export default function ArchivePage() {
             onClick={() => setSelectedPost(null)}
           >
             <motion.div
-              className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-y-auto"
+              style={{ maxHeight: '85dvh', overscrollBehavior: 'contain' }}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -1174,22 +1176,61 @@ export default function ArchivePage() {
             onClick={() => setShowFactCheckModal(false)}
           >
             <motion.div
-              className="bg-slate-900 border border-white/20 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-2xl"
+              className="bg-slate-900 border border-white/20 rounded-2xl w-full max-w-2xl overflow-y-auto shadow-2xl p-6 sm:p-7"
+              style={{ maxHeight: '85dvh', overscrollBehavior: 'contain' }}
               onClick={(e) => e.stopPropagation()}
             >
-               <div className="p-6">
-                 <h2 className="text-xl font-bold text-white mb-4">AI Fact Check Result</h2>
-                 {factCheckResult.issues.map((issue, idx) => (
-                    <div key={idx} className="mb-4">
-                       <p className="text-red-400">Issue: {issue.original}</p>
-                       <p className="text-gray-300">Reason: {issue.reason}</p>
-                    </div>
-                 ))}
-                 <div className="flex justify-end gap-2 mt-4">
-                    <button onClick={() => setShowFactCheckModal(false)} className="px-4 py-2 text-gray-400">Close</button>
-                    <button onClick={applyCorrection} className="px-4 py-2 bg-purple-600 text-white rounded">Apply Fix</button>
-                 </div>
-               </div>
+              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-400" />
+                AI 팩트체크 검증 결과
+              </h2>
+
+              {factCheckResult.issues && factCheckResult.issues.length > 0 ? (
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    {factCheckResult.issues.map((issue, idx) => (
+                      <div key={idx} className="bg-slate-800/80 border border-red-500/30 rounded-xl p-3 text-xs">
+                        <span className="font-bold text-red-400">감지된 왜곡 표현: </span>
+                        <span className="text-red-300 font-semibold">{issue.original}</span>
+                        <p className="text-gray-300 mt-1">{issue.reason}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="bg-slate-800 border border-white/10 rounded-xl p-3.5 space-y-1">
+                    <span className="text-xs font-bold text-cyan-300">추천 교정본:</span>
+                    <p className="text-xs text-gray-200 whitespace-pre-wrap leading-relaxed">
+                      {factCheckResult.correctedContent}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-xs text-emerald-300 space-y-1">
+                  <p className="font-bold">✓ 역사 왜곡 및 사실 오류가 발견되지 않았습니다.</p>
+                  <p className="text-emerald-400/80 text-[11px] leading-relaxed">
+                    작성하신 본문은 역사적 사실에 부합하며 왜곡 표현이 없어 교정 없이 그대로 등록하실 수 있습니다.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2.5 mt-6 pt-4 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setShowFactCheckModal(false)}
+                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-gray-300 rounded-xl text-xs font-semibold transition cursor-pointer"
+                >
+                  닫기
+                </button>
+                {factCheckResult.issues && factCheckResult.issues.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={applyCorrection}
+                    className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer shadow-md"
+                  >
+                    본문에 교정본 적용
+                  </button>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}

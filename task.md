@@ -57,6 +57,11 @@
 - [x] Document Android vs iOS Mobile Deployment comparison guide (`MOBILE_DEPLOYMENT_GUIDE.md`) <!-- id: 58 -->
 - [x] Fix login & signup email parsing to correctly support full custom email addresses (`authService.ts`, `BottomTabBar.tsx`) <!-- id: 60 -->
 - [x] Implement Biometric Authentication (Fingerprint & Face ID) quick login, auto-registration modal, and MyPage toggle switch (`biometricService.ts`, `Login.tsx`, `MyPage.tsx`) <!-- id: 61 -->
+- [x] Fix biometric toggle switch UI rendering and sliding animation on MyPage (`MyPage.tsx`) <!-- id: 63 -->
+- [x] Compact Bottom Navigation Bar to 70% width & sleek capsule scale (`BottomTabBar.tsx`) <!-- id: 64 -->
+- [x] Fix AI Fact-Check: preserve original text without arbitrary modifications when no distortion is found (`aiService.ts`, `AIFactCheck.tsx`, `archive/page.tsx`) <!-- id: 65 -->
+- [x] Configure Capacitor Keyboard plugin (`resize: body`) & mobile modal dynamic viewport height (`85dvh`) for soft keyboard clipping prevention (`capacitor.config.ts`, `archive/page.tsx`, `FooterSection.tsx`) <!-- id: 66 -->
+- [x] Implement robust 3-layer BottomTabBar auto-hide on Android & iOS (`keyboardDidShow`/`keyboardDidHide`, focus capturing, height tracking) (`BottomTabBar.tsx`, `AndroidManifest.xml`) <!-- id: 67 -->
 - [x] Implement Supabase Auth Password Reset email workflow and dedicated reset page (`authService.ts`, `Login.tsx`, `ResetPassword.tsx`, `router/config.tsx`) <!-- id: 62 -->
 - [x] Streamline Signup form: unify ID with Email, add Email duplicate check, remove redundant address field, and make diver fields optional (`Signup.tsx`, `authService.ts`) <!-- id: 63 -->
 - [x] Fix archive post edit bugs: allow admin editing, preserve category & files, and support fallback updates for demo posts (`archiveService.ts`, `archive/page.tsx`) <!-- id: 64 -->

@@ -293,42 +293,55 @@ export default function AIFactCheck() {
             {/* AI Result Banner (If analyzed) */}
             {aiResult && (
               <div className="p-4 sm:p-5 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl border border-blue-200 space-y-3.5 animate-fadeIn">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <h3 className="text-xs sm:text-sm font-bold text-blue-950 flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                     AI 역사 왜곡 분석 결과
                   </h3>
-                  <button
-                    type="button"
-                    onClick={handleApplyCorrection}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition active:scale-95"
-                  >
-                    본문에 교정본 적용
-                  </button>
+                  {aiResult.issues && aiResult.issues.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={handleApplyCorrection}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer"
+                    >
+                      본문에 교정본 적용
+                    </button>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold border border-emerald-300">
+                      ✓ 교정 불필요 (올바른 원문)
+                    </span>
+                  )}
                 </div>
 
                 {aiResult.issues && aiResult.issues.length > 0 ? (
-                  <div className="space-y-2">
-                    {aiResult.issues.map((issue, idx) => (
-                      <div key={idx} className="bg-white/90 border border-amber-200 rounded-lg p-2.5 text-xs">
-                        <span className="font-bold text-amber-900">감지된 왜곡 표현: </span>
-                        <span className="text-red-600 font-semibold">{issue.original}</span>
-                        <p className="text-gray-600 mt-1">{issue.reason}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-emerald-700 font-medium">
-                    ✓ 본문에서 역사적 왜곡 표현이 발견되지 않았습니다. 올바른 역사적 서술입니다!
-                  </p>
-                )}
+                  <>
+                    <div className="space-y-2">
+                      {aiResult.issues.map((issue, idx) => (
+                        <div key={idx} className="bg-white/90 border border-amber-200 rounded-lg p-2.5 text-xs">
+                          <span className="font-bold text-amber-900">감지된 왜곡 표현: </span>
+                          <span className="text-red-600 font-semibold">{issue.original}</span>
+                          <p className="text-gray-600 mt-1">{issue.reason}</p>
+                        </div>
+                      ))}
+                    </div>
 
-                <div className="bg-white/95 rounded-lg p-3 border border-blue-100 space-y-1">
-                  <span className="text-xs font-bold text-gray-700">추천 정정 교정본:</span>
-                  <p className="text-xs text-gray-800 whitespace-pre-wrap leading-relaxed">
-                    {aiResult.correctedContent}
-                  </p>
-                </div>
+                    <div className="bg-white/95 rounded-lg p-3 border border-blue-100 space-y-1">
+                      <span className="text-xs font-bold text-gray-700">추천 정정 교정본:</span>
+                      <p className="text-xs text-gray-800 whitespace-pre-wrap leading-relaxed">
+                        {aiResult.correctedContent}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-lg text-xs text-emerald-800 space-y-1">
+                    <p className="font-bold flex items-center gap-1">
+                      ✓ 역사적 왜곡이나 오류 표현이 발견되지 않았습니다.
+                    </p>
+                    <p className="text-emerald-700 text-[11px] leading-relaxed">
+                      작성하신 본문은 역사적 사실에 부합하며 왜곡 표현이 없어 추가적인 문장 교정이 필요하지 않습니다.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
