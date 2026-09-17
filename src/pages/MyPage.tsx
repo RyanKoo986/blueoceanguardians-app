@@ -15,6 +15,12 @@ export default function MyPage() {
   const [bioType, setBioType] = useState<'fingerprint' | 'face' | 'biometrics'>('fingerprint');
 
   React.useEffect(() => {
+    if (isAuthenticated && user?.role === 'ADMIN') {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  React.useEffect(() => {
     biometricService.checkAvailability().then((status) => {
       setBioEnabled(status.isEnabled);
       setBioType(status.biometryType as any);
@@ -125,89 +131,7 @@ export default function MyPage() {
           </div>
         </div>
 
-        {/* Admin Control Center Section (Only for ADMIN) */}
-        {user.role === 'ADMIN' && (
-          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950/80 border border-red-500/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl backdrop-blur-xl">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
-                  <Shield className="w-6 h-6" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    관리자 관제 센터
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30">
-                      LIVE
-                    </span>
-                  </h2>
-                  <p className="text-xs text-gray-300 mt-0.5">시민 제보, 수중정화 신청, 고객 문의 실시간 처리</p>
-                </div>
-              </div>
 
-              <Link
-                to="/admin"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-sm font-bold shadow-lg shadow-red-900/30 transition active:scale-95"
-              >
-                통합 대시보드 바로가기
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            {/* Quick Action Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              <button
-                type="button"
-                onClick={() => navigate('/admin', { state: { tab: 'reports' } })}
-                className="text-left p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-red-500/20 hover:border-red-500/40 transition group active:scale-[0.98] flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center">
-                    <AlertTriangle className="w-5 h-5" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-red-400 transition" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white group-hover:text-red-300 transition">시민 오류 제보 관리</h3>
-                  <p className="text-xs text-gray-400 mt-1">AI 왜곡 정보 및 시민 신고 내역 검토·삭제</p>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate('/admin', { state: { tab: 'cleanup' } })}
-                className="text-left p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-blue-500/20 hover:border-blue-500/40 transition group active:scale-[0.98] flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center">
-                    <Waves className="w-5 h-5" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-blue-400 transition" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white group-hover:text-blue-300 transition">수중정화 신청자 관리</h3>
-                  <p className="text-xs text-gray-400 mt-1">봉사활동 신청서, 연락처, 지역 확인</p>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate('/admin', { state: { tab: 'contacts' } })}
-                className="text-left p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-cyan-500/20 hover:border-cyan-500/40 transition group active:scale-[0.98] flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-cyan-400 transition" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition">1:1 문의사항 관리</h3>
-                  <p className="text-xs text-gray-400 mt-1">고객센터 접수 문의 조회 및 확인 처리</p>
-                </div>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Profile Info Details (Only for General Users/Researchers) */}
         {user.role !== 'ADMIN' && (

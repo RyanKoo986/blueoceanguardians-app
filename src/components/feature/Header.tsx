@@ -9,6 +9,7 @@ function Header() {
   const location = useLocation();
   const isHome = location.pathname === '/';
   const isLightPage = [
+    '/admin',
     '/contact',
     '/login',
     '/signup',
