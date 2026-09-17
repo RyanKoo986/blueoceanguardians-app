@@ -62,9 +62,13 @@
 - [x] Fix AI Fact-Check: preserve original text without arbitrary modifications when no distortion is found (`aiService.ts`, `AIFactCheck.tsx`, `archive/page.tsx`) <!-- id: 65 -->
 - [x] Configure Capacitor Keyboard plugin (`resize: body`) & mobile modal dynamic viewport height (`85dvh`) for soft keyboard clipping prevention (`capacitor.config.ts`, `archive/page.tsx`, `FooterSection.tsx`) <!-- id: 66 -->
 - [x] Implement robust 3-layer BottomTabBar auto-hide on Android & iOS (`keyboardDidShow`/`keyboardDidHide`, focus capturing, height tracking) (`BottomTabBar.tsx`, `AndroidManifest.xml`) <!-- id: 67 -->
+- [x] Implement 2x2 balanced grid in Archive Detail Modal with 등록일 and 수정일 (`-` if unedited) (`archive/page.tsx`) <!-- id: 68 -->
+- [x] Fix Admin Dashboard header clipping: apply explicit safe-area top padding (`76px`) and bottom padding (`96px`) (`AdminDashboard.tsx`) <!-- id: 69 -->
 - [x] Implement Supabase Auth Password Reset email workflow and dedicated reset page (`authService.ts`, `Login.tsx`, `ResetPassword.tsx`, `router/config.tsx`) <!-- id: 62 -->
 - [x] Streamline Signup form: unify ID with Email, add Email duplicate check, remove redundant address field, and make diver fields optional (`Signup.tsx`, `authService.ts`) <!-- id: 63 -->
-- [x] Fix archive post edit bugs: allow admin editing, preserve category & files, and support fallback updates for demo posts (`archiveService.ts`, `archive/page.tsx`) <!-- id: 64 -->
+- [x] Unify Top Header theme with dark glassmorphism on `/admin` and `/mypage` (`Header.tsx`) <!-- id: 70 -->
+- [x] Embed Biometric Authentication toggle switch and direct MyPage navigation button into Admin Dashboard (`AdminDashboard.tsx`) <!-- id: 71 -->
+- [x] Enhance high-contrast readability and vibrant color aesthetics across BottomTabBar and Admin segmented tabs (`BottomTabBar.tsx`, `AdminDashboard.tsx`) <!-- id: 72 -->
 - [ ] Push Web + Mobile completed base to GitHub repository <!-- id: 20 -->
 
 
