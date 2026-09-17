@@ -41,12 +41,18 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col pt-[80px]">
+    <div 
+      className="min-h-screen bg-gray-50 flex flex-col"
+      style={{
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 68px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 140px)',
+      }}
+    >
       <Helmet>
         <title>새 비밀번호 설정 - Blue Guardians</title>
       </Helmet>
 
-      <div className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="flex-grow flex items-start sm:items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-2xl shadow-sm border border-gray-200">
           <div className="text-center">
             <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 mx-auto mb-3">

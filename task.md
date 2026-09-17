@@ -66,9 +66,10 @@
 - [x] Fix Admin Dashboard header clipping: apply explicit safe-area top padding (`76px`) and bottom padding (`96px`) (`AdminDashboard.tsx`) <!-- id: 69 -->
 - [x] Implement Supabase Auth Password Reset email workflow and dedicated reset page (`authService.ts`, `Login.tsx`, `ResetPassword.tsx`, `router/config.tsx`) <!-- id: 62 -->
 - [x] Streamline Signup form: unify ID with Email, add Email duplicate check, remove redundant address field, and make diver fields optional (`Signup.tsx`, `authService.ts`) <!-- id: 63 -->
-- [x] Unify Top Header theme with dark glassmorphism on `/admin` and `/mypage` (`Header.tsx`) <!-- id: 70 -->
-- [x] Embed Biometric Authentication toggle switch and direct MyPage navigation button into Admin Dashboard (`AdminDashboard.tsx`) <!-- id: 71 -->
-- [x] Enhance high-contrast readability and vibrant color aesthetics across BottomTabBar and Admin segmented tabs (`BottomTabBar.tsx`, `AdminDashboard.tsx`) <!-- id: 72 -->
+- [x] Unify Top Header theme with light theme on `/admin` (`Header.tsx`) <!-- id: 70 -->
+- [x] Unify Admin Profile, Biometric toggle, and Live Control Center into a single, spacious White-tone Dashboard (`AdminDashboard.tsx`) <!-- id: 71 -->
+- [x] Eliminate duplicate admin control center in MyPage and redirect admins directly to Admin Dashboard (`MyPage.tsx`) <!-- id: 72 -->
+- [x] Fix mobile virtual keyboard scrolling and top-header clipping across Signup, Login, and ResetPassword (`Signup.tsx`, `Login.tsx`, `ResetPassword.tsx`) <!-- id: 73 -->
 - [ ] Push Web + Mobile completed base to GitHub repository <!-- id: 20 -->
 
 

@@ -139,12 +139,18 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white sm:bg-gray-50 flex flex-col pt-[55px] sm:pt-[80px]">
+    <div 
+      className="min-h-screen bg-white sm:bg-gray-50 flex flex-col"
+      style={{
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 68px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 140px)',
+      }}
+    >
       <Helmet>
         <title>회원가입 - Blue Guardians</title>
       </Helmet>
 
-      <div className="flex-grow flex items-center justify-center pt-4 pb-28 sm:py-10 px-4 sm:px-6 lg:px-8">
+      <div className="flex-grow flex items-start sm:items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-5 bg-white sm:p-9 sm:rounded-2xl sm:shadow-sm sm:border sm:border-gray-200">
           <div className="text-center hidden sm:block">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 border-b border-gray-200 pb-4">

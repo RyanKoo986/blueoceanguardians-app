@@ -7,11 +7,11 @@ import {
   AlertTriangle, 
   Users, 
   MessageSquare, 
-  Trash2, 
   ExternalLink,
   Fingerprint,
   Scan,
-  User
+  Mail,
+  LogOut
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { reportService, type ReportItem } from '../../services/reportService';
@@ -20,7 +20,7 @@ import { contactService, type ContactForm } from '../../services/contactService'
 import { biometricService } from '../../services/biometricService';
 
 export default function AdminDashboard() {
-  const { user, isAdmin, isAuthenticated } = useAuth();
+  const { user, isAdmin, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const initialTab = (location.state as any)?.tab;
@@ -89,6 +89,11 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   const handleMarkReportRead = async (id: string) => {
     try {
       await reportService.markAsRead(id);
@@ -148,78 +153,85 @@ export default function AdminDashboard() {
 
   return (
     <div 
-      className="min-h-screen bg-slate-950 text-white px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-slate-50 text-slate-900 px-4 sm:px-6 lg:px-8"
       style={{
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 76px)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 110px)',
       }}
     >
       <Helmet>
         <title>관리자 관제 센터 - Blue Guardians</title>
       </Helmet>
 
-      <div className="max-w-7xl mx-auto space-y-5">
-        {/* Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
-              <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
+      <div className="max-w-5xl mx-auto space-y-6 sm:space-y-7">
+        {/* Top Profile & Admin Header Card */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-500 to-rose-400 p-0.5 shadow-md flex-shrink-0">
+              <div className="w-full h-full bg-white rounded-2xl flex items-center justify-center">
+                <Shield className="w-7 h-7 text-red-600" />
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">관리자 관제 센터</h1>
-              <p className="text-xs text-slate-300 mt-0.5">시민 제보 · 수중정화 신청 · 고객 문의 실시간 관리</p>
+            <div className="space-y-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                  {user?.name || '블루오션 관리자'}
+                </h1>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 border border-red-200">
+                  ADMIN
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 flex items-center gap-1.5 truncate">
+                <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span>{user?.email || 'dokdo-admin@sol.com'}</span>
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              to="/mypage"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-white/15 transition text-slate-200 active:scale-95 shrink-0"
-            >
-              <User className="w-3.5 h-3.5 text-cyan-400" />
-              <span>내 계정</span>
-            </Link>
+          <div className="flex items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
             <Link
               to="/archive"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-white/15 transition text-slate-200 active:scale-95 shrink-0"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-200/80 transition active:scale-95 shadow-sm"
             >
-              <FileText className="w-3.5 h-3.5 text-blue-400" />
+              <FileText className="w-4 h-4 text-blue-600" />
               <span>게시판</span>
             </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 transition active:scale-95 shadow-sm"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>로그아웃</span>
+            </button>
           </div>
         </div>
 
         {/* Security & Biometric Login Card */}
-        <div className="bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-4 sm:p-5 backdrop-blur-md shadow-lg flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5 min-w-0">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{ backgroundColor: 'rgba(6, 182, 212, 0.15)', color: '#22d3ee' }}
-            >
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-sm flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 shrink-0 shadow-inner">
               {bioType === 'face' ? (
-                <Scan className="w-5 h-5" />
+                <Scan className="w-6 h-6" />
               ) : (
-                <Fingerprint className="w-5 h-5" />
+                <Fingerprint className="w-6 h-6" />
               )}
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-sm sm:text-base font-bold text-white">
+                <h2 className="text-base font-bold text-slate-900">
                   생체 인증 간편 로그인
-                </h3>
-                <span
-                  className="text-[10px] px-2 py-0.5 rounded-full font-bold border"
-                  style={{
-                    backgroundColor: bioEnabled ? 'rgba(16, 185, 129, 0.2)' : 'rgba(148, 163, 184, 0.2)',
-                    color: bioEnabled ? '#34d399' : '#cbd5e1',
-                    borderColor: bioEnabled ? 'rgba(16, 185, 129, 0.4)' : 'rgba(148, 163, 184, 0.3)',
-                  }}
-                >
+                </h2>
+                <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold border ${
+                  bioEnabled
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-slate-100 text-slate-500 border-slate-200'
+                }`}>
                   {bioEnabled ? '사용 중' : '비활성'}
                 </span>
               </div>
-              <p className="text-xs text-slate-300 mt-0.5 truncate">
-                관리자 계정 {bioType === 'face' ? 'Face ID' : '지문'} 간편 로그인 설정
+              <p className="text-xs sm:text-sm text-slate-500 leading-normal">
+                스마트폰의 {bioType === 'face' ? 'Face ID' : '지문 센서'}로 비밀번호 없이 즉시 로그인합니다.
               </p>
             </div>
           </div>
@@ -230,18 +242,18 @@ export default function AdminDashboard() {
             aria-checked={bioEnabled}
             onClick={handleToggleBiometric}
             style={{
-              width: '52px',
-              height: '30px',
-              backgroundColor: bioEnabled ? '#06b6d4' : '#475569',
+              width: '54px',
+              height: '32px',
+              backgroundColor: bioEnabled ? '#0284c7' : '#cbd5e1',
               transition: 'background-color 0.25s ease',
             }}
-            className="relative shrink-0 cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-950"
+            className="relative shrink-0 cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 shadow-inner"
             aria-label="생체 인증 토글"
           >
             <span
               style={{
-                width: '24px',
-                height: '24px',
+                width: '26px',
+                height: '26px',
                 transform: bioEnabled ? 'translateX(22px)' : 'translateX(1px)',
                 transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
@@ -250,20 +262,20 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {/* Tab Navigation - Modern High-Contrast Segmented Control */}
-        <div className="bg-slate-900/95 border border-white/15 rounded-2xl p-1.5 flex gap-1.5 shadow-xl backdrop-blur-md">
+        {/* Tab Navigation - Modern Segmented Control */}
+        <div className="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1.5 shadow-inner">
           <button
             onClick={() => setActiveTab('reports')}
-            className={`flex-1 py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
               activeTab === 'reports'
-                ? 'bg-red-500/30 text-white border border-red-500/60 shadow-md'
-                : 'text-slate-300 hover:text-white hover:bg-white/5 border border-transparent'
+                ? 'bg-white text-red-600 shadow-md border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
             }`}
           >
-            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
             <span className="truncate">오류 제보</span>
-            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-bold font-mono ${
-              activeTab === 'reports' ? 'bg-red-500/40 text-red-100' : 'bg-slate-800 text-slate-300 border border-white/10'
+            <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold font-mono ${
+              activeTab === 'reports' ? 'bg-red-100 text-red-700' : 'bg-slate-300 text-slate-700'
             }`}>
               {reports.length}
             </span>
@@ -271,16 +283,16 @@ export default function AdminDashboard() {
 
           <button
             onClick={() => setActiveTab('cleanup')}
-            className={`flex-1 py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
               activeTab === 'cleanup'
-                ? 'bg-blue-500/30 text-white border border-blue-500/60 shadow-md'
-                : 'text-slate-300 hover:text-white hover:bg-white/5 border border-transparent'
+                ? 'bg-white text-blue-600 shadow-md border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
             }`}
           >
-            <Users className="w-4 h-4 text-blue-400 shrink-0" />
+            <Users className="w-4 h-4 text-blue-500 shrink-0" />
             <span className="truncate">정화 신청</span>
-            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-bold font-mono ${
-              activeTab === 'cleanup' ? 'bg-blue-500/40 text-blue-100' : 'bg-slate-800 text-slate-300 border border-white/10'
+            <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold font-mono ${
+              activeTab === 'cleanup' ? 'bg-blue-100 text-blue-700' : 'bg-slate-300 text-slate-700'
             }`}>
               {cleanups.length}
             </span>
@@ -288,16 +300,16 @@ export default function AdminDashboard() {
 
           <button
             onClick={() => setActiveTab('contacts')}
-            className={`flex-1 py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
               activeTab === 'contacts'
-                ? 'bg-cyan-500/30 text-white border border-cyan-500/60 shadow-md'
-                : 'text-slate-300 hover:text-white hover:bg-white/5 border border-transparent'
+                ? 'bg-white text-cyan-700 shadow-md border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
             }`}
           >
-            <MessageSquare className="w-4 h-4 text-cyan-400 shrink-0" />
+            <MessageSquare className="w-4 h-4 text-cyan-600 shrink-0" />
             <span className="truncate">1:1 문의</span>
-            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-bold font-mono ${
-              activeTab === 'contacts' ? 'bg-cyan-500/40 text-cyan-100' : 'bg-slate-800 text-slate-300 border border-white/10'
+            <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold font-mono ${
+              activeTab === 'contacts' ? 'bg-cyan-100 text-cyan-800' : 'bg-slate-300 text-slate-700'
             }`}>
               {contacts.length}
             </span>
@@ -306,51 +318,53 @@ export default function AdminDashboard() {
 
         {/* Tab Content */}
         {loading ? (
-          <div className="py-20 text-center text-slate-300">데이터를 불러오는 중입니다...</div>
+          <div className="py-24 text-center text-slate-500 font-medium">데이터를 불러오는 중입니다...</div>
         ) : activeTab === 'reports' ? (
           <div className="space-y-4">
             {reports.length === 0 ? (
-              <div className="text-center py-16 bg-slate-900/60 rounded-2xl border border-white/10 text-slate-200 text-sm">
-                접수된 오류 제보가 없습니다.
+              <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300 text-slate-500 text-sm shadow-sm space-y-2">
+                <AlertTriangle className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="font-semibold text-slate-600">접수된 오류 제보가 없습니다.</p>
+                <p className="text-xs text-slate-400">새로운 시민 제보가 접수되면 이곳에 표시됩니다.</p>
               </div>
             ) : (
               <div className="grid gap-4">
                 {reports.map((item) => (
-                  <div key={item.id} className="bg-slate-900/90 border border-white/15 rounded-2xl p-5 sm:p-6 space-y-4 shadow-lg">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                          item.isRead ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/30' : 'bg-red-500/25 text-red-200 border border-red-500/30'
+                  <div key={item.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm hover:shadow transition">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
+                          item.isRead ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'
                         }`}>
                           {item.isRead ? '확인 완료' : '신규 접수'}
                         </span>
-                        <span className="text-xs text-slate-300">{new Date(item.createdAt).toLocaleDateString()}</span>
+                        <span className="text-xs text-slate-400 font-medium">{new Date(item.createdAt).toLocaleDateString()}</span>
                       </div>
                       <div className="flex gap-2">
                         {!item.isRead && (
                           <button
                             onClick={() => handleMarkReportRead(item.id)}
-                            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-100 rounded-lg border border-white/10 transition"
+                            className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 rounded-xl border border-slate-200 transition active:scale-95"
                           >
                             읽음 처리
                           </button>
                         )}
                         <button
                           onClick={() => handleDeleteReport(item.id)}
-                          className="px-3 py-1.5 bg-red-950/60 hover:bg-red-900/70 text-xs font-semibold text-red-200 border border-red-700/50 rounded-lg transition"
+                          className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-600 border border-rose-200 rounded-xl transition active:scale-95"
                         >
                           삭제
                         </button>
                       </div>
                     </div>
                     {item.url && (
-                      <p className="text-xs text-cyan-300 flex items-center gap-1.5">
-                        <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
-                        <span className="text-slate-300">URL:</span>
-                        <a href={item.url} target="_blank" rel="noreferrer" className="underline text-cyan-300 hover:text-cyan-200">{item.url}</a>
+                      <p className="text-xs text-blue-600 flex items-center gap-1.5">
+                        <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
+                        <span className="text-slate-400">제보 URL:</span>
+                        <a href={item.url} target="_blank" rel="noreferrer" className="underline hover:text-blue-700">{item.url}</a>
                       </p>
                     )}
-                    <p className="text-sm text-slate-100 leading-relaxed bg-slate-950/60 p-3.5 rounded-xl border border-white/5">{item.description}</p>
+                    <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">{item.description}</p>
                   </div>
                 ))}
               </div>
@@ -359,42 +373,44 @@ export default function AdminDashboard() {
         ) : activeTab === 'cleanup' ? (
           <div className="space-y-4">
             {cleanups.length === 0 ? (
-              <div className="text-center py-16 bg-slate-900/60 rounded-2xl border border-white/10 text-slate-200 text-sm">
-                접수된 수중정화 신청이 없습니다.
+              <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300 text-slate-500 text-sm shadow-sm space-y-2">
+                <Users className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="font-semibold text-slate-600">접수된 수중정화 신청이 없습니다.</p>
+                <p className="text-xs text-slate-400">시민들의 수중정화 참가 신청서가 접수되면 이곳에 표시됩니다.</p>
               </div>
             ) : (
               <div className="grid gap-4">
                 {cleanups.map((item) => (
-                  <div key={item.id} className="bg-slate-900/90 border border-white/15 rounded-2xl p-5 sm:p-6 space-y-3 shadow-lg">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                  <div key={item.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm hover:shadow transition">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
                       <div>
-                        <span className="text-base font-bold text-white mr-3">{item.name}</span>
-                        <span className="text-xs text-slate-300">{item.contact} | {item.region || '전국'}</span>
+                        <span className="text-base font-bold text-slate-900 mr-3">{item.name}</span>
+                        <span className="text-xs text-slate-500">{item.contact} | {item.region || '전국'}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                          item.isRead ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/30' : 'bg-blue-500/25 text-blue-200 border border-blue-500/30'
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
+                          item.isRead ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200'
                         }`}>
                           {item.isRead ? '확인 완료' : '신규 신청'}
                         </span>
                         {!item.isRead && (
                           <button
                             onClick={() => handleMarkCleanupRead(item.id)}
-                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white rounded-lg shadow transition"
+                            className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white rounded-xl shadow-sm transition active:scale-95"
                           >
                             확인
                           </button>
                         )}
                         <button
                           onClick={() => handleDeleteCleanup(item.id)}
-                          className="px-3 py-1.5 bg-red-950/60 hover:bg-red-900/70 text-xs font-semibold text-red-200 border border-red-700/50 rounded-lg transition"
+                          className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-600 border border-rose-200 rounded-xl transition active:scale-95"
                         >
                           삭제
                         </button>
                       </div>
                     </div>
                     {item.message && (
-                      <p className="text-xs text-slate-200 bg-slate-950/60 p-3.5 rounded-xl border border-white/5 leading-relaxed">{item.message}</p>
+                      <p className="text-xs sm:text-sm text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed">{item.message}</p>
                     )}
                   </div>
                 ))}
@@ -404,37 +420,39 @@ export default function AdminDashboard() {
         ) : (
           <div className="space-y-4">
             {contacts.length === 0 ? (
-              <div className="text-center py-16 bg-slate-900/60 rounded-2xl border border-white/10 text-slate-200 text-sm">
-                접수된 문의사항이 없습니다.
+              <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300 text-slate-500 text-sm shadow-sm space-y-2">
+                <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="font-semibold text-slate-600">접수된 문의사항이 없습니다.</p>
+                <p className="text-xs text-slate-400">고객센터를 통해 접수된 1:1 문의가 이곳에 표시됩니다.</p>
               </div>
             ) : (
               <div className="grid gap-4">
                 {contacts.map((item) => (
-                  <div key={item.id} className="bg-slate-900/90 border border-white/15 rounded-2xl p-5 sm:p-6 space-y-3 shadow-lg">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                  <div key={item.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm hover:shadow transition">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div>
-                        <span className="text-base font-bold text-white mr-2">{item.name}</span>
-                        <span className="text-xs text-slate-300">{item.email}</span>
+                        <span className="text-base font-bold text-slate-900 mr-2">{item.name}</span>
+                        <span className="text-xs text-slate-500">{item.email}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-400">{new Date(item.createdAt).toLocaleDateString()}</span>
                         {!item.read && (
                           <button
                             onClick={() => handleMarkContactRead(item.id)}
-                            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-100 rounded-lg border border-white/10 transition"
+                            className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 rounded-xl border border-slate-200 transition active:scale-95"
                           >
                             읽음
                           </button>
                         )}
                         <button
                           onClick={() => handleDeleteContact(item.id)}
-                          className="px-2.5 py-1 bg-red-950/60 hover:bg-red-900/70 text-xs font-semibold text-red-200 border border-red-700/50 rounded-lg transition"
+                          className="px-3 py-1 bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-600 border border-rose-200 rounded-xl transition active:scale-95"
                         >
                           삭제
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm text-slate-100 bg-slate-950/60 p-3.5 rounded-xl border border-white/5 leading-relaxed">{item.message}</p>
+                    <p className="text-sm text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed">{item.message}</p>
                   </div>
                 ))}
               </div>
