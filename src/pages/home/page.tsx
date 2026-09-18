@@ -58,11 +58,12 @@ export default function HomePage() {
                   <span className="text-brand-cyan-400 text-sm font-mono tracking-[0.3em] uppercase mb-4 block">
                     Project Overview
                   </span>
-                  <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-8 tracking-[0.05em] leading-snug sm:leading-tight">
-                    <div className="mb-[10px]">
-                      디지털 공공외교와 시민 참여를 결합한
+                  <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-8 tracking-[0.05em] leading-snug sm:leading-tight break-keep">
+                    <div className="mb-[10px] break-keep">
+                      디지털 공공외교와<br />
+                      시민 참여를 결합한
                     </div>
-                    <div>
+                    <div className="break-keep">
                       <span className="bg-gradient-to-r from-brand-cyan-400 to-brand-cyan-600 bg-clip-text text-transparent font-bold">
                         독도 인식 개선 플랫폼
                       </span>

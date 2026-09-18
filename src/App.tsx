@@ -1,4 +1,4 @@
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 import { AppRoutes } from './router';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
@@ -7,9 +7,39 @@ import { BottomTabBar } from './components/navigation/BottomTabBar';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import ScrollToTop from './components/common/ScrollToTop';
-
+import FloatingScrollToTop from './components/common/FloatingScrollToTop';
 import { FooterSection } from './pages/home/components/FooterSection';
 import { ContestPromo } from './components/feature/ContestPromo';
+
+function AppShell() {
+  const location = useLocation();
+  const isLightPage = [
+    '/contact',
+    '/admin',
+    '/login',
+    '/signup',
+    '/reset-password',
+    '/mypage',
+    '/privacy',
+  ].some((path) => location.pathname === path || location.pathname.startsWith(path));
+
+  return (
+    <div
+      className={`min-h-screen transition-colors duration-300 flex flex-col ${
+        isLightPage ? 'bg-gray-50 text-gray-900' : 'bg-brand-navy-950 text-white'
+      }`}
+    >
+      <Header />
+      <main className="flex-grow">
+        <AppRoutes />
+      </main>
+      <ContestPromo />
+      <FooterSection />
+      <FloatingScrollToTop />
+      <BottomTabBar />
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -18,15 +48,7 @@ function App() {
         <AuthProvider>
           <BrowserRouter basename={import.meta.env.BASE_URL}>
             <ScrollToTop />
-            <div className="min-h-screen bg-gray-900 dark:bg-gray-900 transition-colors duration-300 flex flex-col">
-              <Header />
-              <main className="flex-grow">
-                <AppRoutes />
-              </main>
-              <ContestPromo />
-              <FooterSection />
-              <BottomTabBar />
-            </div>
+            <AppShell />
           </BrowserRouter>
         </AuthProvider>
       </ThemeProvider>

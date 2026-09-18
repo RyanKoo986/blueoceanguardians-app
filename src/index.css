@@ -12,6 +12,9 @@
 .h-\[35vh\] { height: 35vh; }
 .h-\[45vh\] { height: 45vh; }
 button[type="submit"] { min-height: 48px; }
+.border-black { border-color: #000000; }
+.border-black\/80 { border-color: rgba(0, 0, 0, 0.8); }
+.border-black\/85 { border-color: rgba(0, 0, 0, 0.85); }
 
 /* ==========================================================================
    Capacitor & Mobile Webview Native Optimization (App Store Rejection Prevention)
@@ -33,9 +36,9 @@ input, textarea, select {
   font-size: 16px;
 }
 
-/* 3. Prevent rubber-band bouncing on the document root while keeping smooth touch scrolling */
+/* 3. Enable natural rubber-band spring overscroll while keeping smooth touch scrolling */
 html, body {
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -66,7 +69,14 @@ code {
 
 html, body {
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
+  touch-action: pan-y;
 }
+
+/* Korean typography & word wrap optimization (prevent awkward syllable breaks) */
+html, body, p, span, h1, h2, h3, h4, h5, h6, a, button, label, li, div, input, textarea {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 
 

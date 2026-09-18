@@ -105,6 +105,7 @@ function Header() {
         { to: "/services/contest", label: "수중사진 공모전" },
         { to: "/services/ai-fact-check", label: "AI 정보 정정 시스템" },
         { to: "/services/report", label: "오류 정보 제보" },
+        { to: "/contact", label: "1:1 문의 (Contact)" },
       ]
     },
     { 
@@ -116,6 +117,7 @@ function Header() {
         { to: "/archive?tab=cleanup", label: "수중 정화 활동" },
       ]
     },
+    { to: "/contact", label: "Contact" },
   ];
 
   const isHeaderWhite = isLightPage;
@@ -124,21 +126,21 @@ function Header() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
-          isHeaderWhite
-            ? "border-gray-200 shadow-sm"
-            : isScrolled
-            ? "border-white/10 shadow-lg"
+          isScrolled
+            ? isHeaderWhite
+              ? "border-gray-200/60 shadow-sm"
+              : "border-white/10 shadow-lg"
             : "border-transparent"
         }`}
         style={{
           paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)',
-          backgroundColor: isHeaderWhite
-            ? 'rgba(255, 255, 255, 0.96)'
-            : isScrolled
-            ? 'rgba(2, 6, 23, 0.88)'
-            : 'rgba(2, 6, 23, 0.45)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          backgroundColor: isScrolled
+            ? isHeaderWhite
+              ? 'rgba(255, 255, 255, 0.88)'
+              : 'rgba(2, 6, 23, 0.88)'
+            : 'transparent',
+          backdropFilter: isScrolled ? 'blur(16px)' : 'none',
+          WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

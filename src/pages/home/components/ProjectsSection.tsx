@@ -74,12 +74,12 @@ export function ProjectsSection() {
                   <div className="inline-block px-3 py-1 bg-blue-50 border border-blue-100 rounded-sm">
                     <span className="text-blue-600 text-xs font-mono tracking-widest uppercase font-bold">Platform Core</span>
                   </div>
-                  <h3 className="text-3xl font-light text-gray-900 leading-tight">
+                  <h3 className="text-2xl sm:text-3xl font-light text-gray-900 leading-tight break-keep">
                     정부 연계 공모전 기반
                     <br />
                     <span className="font-bold text-gray-900">디지털 플랫폼</span>
                   </h3>
-                  <p className="text-gray-600 font-normal leading-relaxed text-lg">
+                  <p className="text-gray-600 font-normal leading-relaxed text-base sm:text-lg break-keep">
                     KUDA가 주관하는 전국 독도 수중 사진 공모전의 공식 온라인 플랫폼입니다. 
                     사진 접수부터 심사, 전시까지 전 과정을 <strong className="text-brand-cyan-600">디지털화</strong>하여 효율적인 캠페인 운영을 지원합니다.
                   </p>
@@ -101,12 +101,12 @@ export function ProjectsSection() {
                   <div className="inline-block px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-sm">
                     <span className="text-indigo-600 text-xs font-mono tracking-widest uppercase font-bold">Intelligence Core</span>
                   </div>
-                  <h3 className="text-3xl font-light text-gray-900 leading-tight">
+                  <h3 className="text-2xl sm:text-3xl font-light text-gray-900 leading-tight break-keep">
                     AI 기반 정보 정정
                     <br />
                     <span className="font-bold text-gray-900">시민 참여 모델</span>
                   </h3>
-                  <p className="text-gray-600 font-normal leading-relaxed text-lg">
+                  <p className="text-gray-600 font-normal leading-relaxed text-base sm:text-lg break-keep">
                     독도에 대한 왜곡된 정보와 편향된 국제 서술을 바로잡기 위한 사용자 주도의 정보 정정 참여 구조입니다. 
                     <strong className="text-brand-cyan-600">AI 기술</strong>을 활용해 정확한 내용의 이미지 기반 콘텐츠를 생성·게시합니다.
                   </p>
