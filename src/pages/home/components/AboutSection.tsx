@@ -25,9 +25,8 @@ export function AboutSection() {
             <span className="text-brand-cyan-600 text-xs font-mono tracking-[0.3em] uppercase mb-4 block font-bold">
               About Organization
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan-600 to-blue-600">대한잠수협회</span>와 함께하는
-              <br />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight tracking-tight break-keep">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan-600 to-blue-600">대한잠수협회</span>와 함께하는<br />
               독도 수호 캠페인
             </h2>
           </motion.div>

@@ -20,7 +20,7 @@ export function ContestPromo() {
   if (shouldHide) return null;
 
   return (
-    <section className="py-16 md:py-24 lg:py-32 relative overflow-hidden bg-brand-navy-950">
+    <section className="py-20 sm:py-24 md:py-32 relative overflow-hidden bg-brand-navy-950">
        <div className="absolute inset-0 w-full h-full overflow-hidden">
            <video 
              autoPlay 

@@ -70,7 +70,30 @@
 - [x] Unify Admin Profile, Biometric toggle, and Live Control Center into a single, spacious White-tone Dashboard (`AdminDashboard.tsx`) <!-- id: 71 -->
 - [x] Eliminate duplicate admin control center in MyPage and redirect admins directly to Admin Dashboard (`MyPage.tsx`) <!-- id: 72 -->
 - [x] Fix mobile virtual keyboard scrolling and top-header clipping across Signup, Login, and ResetPassword (`Signup.tsx`, `Login.tsx`, `ResetPassword.tsx`) <!-- id: 73 -->
+- [x] Redesign Contact page to match design mock & integrate Contact into global Header, Mobile Drawer, and Footer navigation (`Contact.tsx`, `Header.tsx`, `FooterSection.tsx`) <!-- id: 74 -->
+- [x] Optimize Korean word-wrap (word-break: keep-all) to prevent awkward word splits and add Floating Scroll-to-Top button (`index.css`, `HeroSection.tsx`, `AboutSection.tsx`, `AITrendSection.tsx`, `ContactSection.tsx`, `ProjectsSection.tsx`, `FloatingScrollToTop.tsx`, `App.tsx`) <!-- id: 75 -->
+- [x] Apply bright theme shell to Contact & subpages, enable spring rubber-band overscroll, and optimize prominent Floating Scroll-to-Top button visibility (`App.tsx`, `index.css`, `FloatingScrollToTop.tsx`) <!-- id: 76 -->
+- [x] Restore transparent glass header on light pages while retaining crisp black text/icons and optimize bottom tab bar spacing (`Header.tsx`, `ContestPromo.tsx`) <!-- id: 77 -->
+- [x] Style BottomTabBar with transparent glass, white active tab border outline, and crisp black icons/text (`BottomTabBar.tsx`) <!-- id: 78 -->
+- [x] Break line explicitly before '함께하는' in AboutSection heading ('대한잠수협회와' <br/> '함께하는 독도 수호 캠페인') (`AboutSection.tsx`) <!-- id: 79 -->
+- [x] Break line explicitly after '함께하는' in AboutSection heading ('대한잠수협회와 함께하는' <br/> '독도 수호 캠페인') (`AboutSection.tsx`) <!-- id: 80 -->
+- [x] Break line explicitly before '여러분의' in HeroSection subtitle ('AI 기술로 만나는 독도와 해양,' <br/> '여러분의 따뜻한 관심이 필요합니다.') (`HeroSection.tsx`) <!-- id: 81 -->
+- [x] Expand ContestPromo banner height & padding (`py-20 sm:py-24 md:py-32`) to prevent button sticking to bottom (`ContestPromo.tsx`, `index.css`) <!-- id: 82 -->
+- [x] Change FloatingScrollToTop trigger to middle of page scroll (midpoint ~45%) instead of top 80px (`FloatingScrollToTop.tsx`) <!-- id: 83 -->
+- [x] Fix mobile touch scroll jitter/lock: remove global CSS `scroll-behavior: smooth`, optimize FloatingScrollToTop scroll listener with RAF & eliminate forced layout reflow (`index.css`, `FloatingScrollToTop.tsx`, `ContactSection.tsx`) <!-- id: 84 -->
+- [x] Update BottomTabBar active tab inner outline to black border and slightly reduce icon/text sizes (`BottomTabBar.tsx`, `index.css`) <!-- id: 85 -->
+- [x] Reduce BottomTabBar overall dimensions by 20% (width from 296px to 238px, icon to 12px, font to 7.5px, compact padding) (`BottomTabBar.tsx`) <!-- id: 86 -->
+- [x] Secure breathing room in BottomTabBar (width 276px, py-1.5, p-1) and raise bottom floating position (bottom: 24px) (`BottomTabBar.tsx`) <!-- id: 87 -->
+- [x] Implement Option 2: expand BottomTabBar width to 320px (min 82%), py-2, icon 15px, text 9.5px so 4-letter words have ample margin without protruding (`BottomTabBar.tsx`) <!-- id: 88 -->
+- [x] Break line explicitly before '시민' in Home intro overview heading ('디지털 공공외교와' <br/> '시민 참여를 결합한') (`page.tsx`) <!-- id: 89 -->
+- [x] Fix FloatingScrollToTop threshold: replace 45% of 11,000px (5,000px) with comfortable 400px / 0.6 viewport height so button appears when leaving top hero section (`FloatingScrollToTop.tsx`) <!-- id: 90 -->
+- [x] Fix FloatingScrollToTop z-index clipping (zIndex: 9999) so it never gets cut in half by sections, and optimize scroll-direction behavior (`FloatingScrollToTop.tsx`) <!-- id: 91 -->
+- [x] Redesign FloatingScrollToTop with Option 1: Frosted white glass, delicate border, soft luxury shadow, and sleek charcoal arrow (`FloatingScrollToTop.tsx`) <!-- id: 92 -->
+- [x] Redesign BottomTabBar with Style A: Frosted white floating capsule, soft gray active pill, and high-contrast typography (`BottomTabBar.tsx`) <!-- id: 93 -->
+- [x] Fix BottomTabBar active tab text & icon invisibility: replace uncompiled text-gray-950 with text-black/text-gray-900, isolate z-index, and bind container text color (`BottomTabBar.tsx`) <!-- id: 94 -->
+- [x] Fix Contact and Privacy page top header collision: apply explicit safe-area paddingTop (calc(env(safe-area-inset-top, 0px) + 76px)) and balanced bottom padding (`Contact.tsx`, `Privacy.tsx`) <!-- id: 95 -->
 - [ ] Push Web + Mobile completed base to GitHub repository <!-- id: 20 -->
+
 
 
 

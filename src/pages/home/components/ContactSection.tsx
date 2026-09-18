@@ -63,12 +63,11 @@ export function ContactSection() {
             <span className="text-brand-cyan-600 text-sm font-bold tracking-[0.3em] uppercase mb-4 block">
               Get Involved
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-              <span className="bg-gradient-to-r from-brand-cyan-600 to-blue-600 bg-clip-text text-transparent">독도와 해양</span>에 
-              관심을 가져주세요
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight break-keep">
+              <span className="bg-gradient-to-r from-brand-cyan-600 to-blue-600 bg-clip-text text-transparent">독도와 해양</span>에 관심을 가져주세요
             </h2>
-            <p className="text-gray-600 text-lg font-normal max-w-2xl mx-auto">
-              우리의 소중한 유산인 독도와 아름다운 해양 생태계, <br className="hidden md:block"/>
+            <p className="text-gray-600 text-base sm:text-lg font-normal max-w-2xl mx-auto leading-relaxed break-keep">
+              우리의 소중한 유산인 독도와 아름다운 해양 생태계, <br className="hidden sm:inline"/>
               여러분의 관심이 모여 더 큰 가치를 만들어냅니다.
             </p>
           </div>
@@ -144,10 +143,10 @@ export function ContactSection() {
             </div>
 
             {/* Right - Contact Form */}
-            <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
+            <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100" style={{ touchAction: 'pan-y' }}>
               <h4 className="text-xl font-bold text-gray-900 mb-6">참여 신청</h4>
               
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6" style={{ touchAction: 'pan-y' }}>
                 <div>
                   <input
                     type="text"

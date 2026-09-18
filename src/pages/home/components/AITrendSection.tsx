@@ -34,11 +34,11 @@ export function AITrendSection() {
             <span className="text-brand-cyan-600 text-xs font-mono tracking-[0.3em] uppercase mb-4 block font-bold">
               Data Analysis
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight break-keep">
               청소년 <span className="text-brand-cyan-600">AI 이미지</span> 활용 트렌드
             </h2>
-            <p className="text-gray-600 text-lg font-normal max-w-3xl mx-auto leading-relaxed">
-              10-20대 청소년들의 AI 이미지 생성 도구 활용률이 급격히 증가하고 있습니다. <br className="hidden md:block"/>
+            <p className="text-gray-600 text-base sm:text-lg font-normal max-w-3xl mx-auto leading-relaxed break-keep">
+              10-20대 청소년들의 AI 이미지 생성 도구 활용률이 급격히 증가하고 있습니다. <br className="hidden sm:inline"/>
               이러한 트렌드를 활용하여 독도 인식 개선 캠페인의 효과를 극대화합니다.
             </p>
           </motion.div>

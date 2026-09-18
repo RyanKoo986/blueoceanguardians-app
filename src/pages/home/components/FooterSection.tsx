@@ -39,18 +39,12 @@ export function FooterSection() {
               >
                 Archive
               </Link>
-              <button 
-                onClick={() => {
-                  if (window.location.pathname !== '/') {
-                    window.location.href = '/#contact';
-                  } else {
-                    scrollToSection('contact');
-                  }
-                }}
+              <Link 
+                to="/contact"
                 className="text-gray-500 hover:text-brand-cyan-600 transition-colors duration-300 cursor-pointer"
               >
-                Contact Us
-              </button>
+                Contact
+              </Link>
             </div>
 
             {/* Social Media Icons */}

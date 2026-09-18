@@ -72,9 +72,8 @@ export default function About() {
                   loading="lazy"
                 />
               </motion.div>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                디지털 공공외교와 시민 참여를 결합한<br />
-                대한민국 독도 인식 개선 플랫폼
+              <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed break-keep">
+                디지털 공공외교와 시민 참여를 결합한<br className="hidden sm:inline" /> 대한민국 독도 인식 개선 플랫폼
               </p>
             </motion.div>
 

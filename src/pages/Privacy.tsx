@@ -6,7 +6,13 @@ export const PrivacyPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 pt-24 pb-20 px-4 sm:px-6 lg:px-8">
+    <div 
+      className="min-h-screen bg-slate-900 text-slate-100 px-4 sm:px-6 lg:px-8"
+      style={{
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 76px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)',
+      }}
+    >
       <div className="max-w-3xl mx-auto">
         {/* Header navigation */}
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-800">
