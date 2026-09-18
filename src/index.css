@@ -68,6 +68,10 @@ code {
 }
 
 html, body {
+  font-family: "Noto Sans KR", "Pretendard", system-ui, Roboto, "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
 }
