@@ -5,15 +5,35 @@ import { AITrendSection } from './components/AITrendSection';
 import { AboutSection } from './components/AboutSection';
 import { ProjectsSection } from './components/ProjectsSection';
 import { ContactSection } from './components/ContactSection';
+import { useAuth } from '../../context/AuthContext';
 
 import { Helmet } from 'react-helmet-async';
 
 export default function HomePage() {
-  const [showIntro, setShowIntro] = useState(true);
-  const [fadeOut, setFadeOut] = useState(false);
-  const [showContent, setShowContent] = useState(false);
+  const { isAuthenticated } = useAuth();
+
+  // Skip intro if user is logged in or has already seen it in the current session
+  const hasSeenInSession = typeof window !== 'undefined' && Boolean(sessionStorage.getItem('hasSeenIntro'));
+  const shouldSkipIntro = Boolean(isAuthenticated || hasSeenInSession);
+
+  const [showIntro, setShowIntro] = useState(!shouldSkipIntro);
+  const [fadeOut, setFadeOut] = useState(shouldSkipIntro);
+  const [showContent, setShowContent] = useState(shouldSkipIntro);
 
   useEffect(() => {
+    if (shouldSkipIntro) {
+      setShowIntro(false);
+      setFadeOut(true);
+      setShowContent(true);
+      return;
+    }
+
+    try {
+      sessionStorage.setItem('hasSeenIntro', 'true');
+    } catch (e) {
+      // ignore
+    }
+
     // 인트로를 1.5초간 표시한 후 페이드아웃 시작
     const introTimer = setTimeout(() => {
       setFadeOut(true);
@@ -29,7 +49,7 @@ export default function HomePage() {
       clearTimeout(introTimer);
       clearTimeout(fadeOutTimer);
     };
-  }, []);
+  }, [shouldSkipIntro]);
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-brand-navy-950">
