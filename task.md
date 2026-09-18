@@ -92,6 +92,7 @@
 - [x] Redesign BottomTabBar with Style A: Frosted white floating capsule, soft gray active pill, and high-contrast typography (`BottomTabBar.tsx`) <!-- id: 93 -->
 - [x] Fix BottomTabBar active tab text & icon invisibility: replace uncompiled text-gray-950 with text-black/text-gray-900, isolate z-index, and bind container text color (`BottomTabBar.tsx`) <!-- id: 94 -->
 - [x] Fix Contact and Privacy page top header collision: apply explicit safe-area paddingTop (calc(env(safe-area-inset-top, 0px) + 76px)) and balanced bottom padding (`Contact.tsx`, `Privacy.tsx`) <!-- id: 95 -->
+- [x] Skip home 3s opening intro animation when logged in and on repeat tab clicks (`page.tsx`, `AuthContext`) <!-- id: 96 -->
 - [ ] Push Web + Mobile completed base to GitHub repository <!-- id: 20 -->
 
 
