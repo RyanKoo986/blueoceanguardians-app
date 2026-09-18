@@ -245,9 +245,7 @@ const Login = () => {
                 <span>
                   {biometricLoading
                     ? '생체 인증 확인 중...'
-                    : bioStatus?.isEnabled
-                    ? '지문 / Face ID로 간편 로그인'
-                    : '지문 / Face ID 간편 로그인 (안내)'}
+                    : '지문 / Face ID 간편 로그인'}
                 </span>
               </button>
               {bioStatus?.isEnabled && bioStatus.registeredEmail && (
