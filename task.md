@@ -94,8 +94,4 @@
 - [x] Fix Contact and Privacy page top header collision: apply explicit safe-area paddingTop (calc(env(safe-area-inset-top, 0px) + 76px)) and balanced bottom padding (`Contact.tsx`, `Privacy.tsx`) <!-- id: 95 -->
 - [x] Skip home 3s opening intro animation when logged in and on repeat tab clicks (`page.tsx`, `AuthContext`) <!-- id: 96 -->
 - [x] Optimize font rendering with native font smoothing (-webkit-font-smoothing: antialiased, optimizeLegibility) and system font stack (`index.css`) <!-- id: 97 -->
-- [ ] Push Web + Mobile completed base to GitHub repository <!-- id: 20 -->
-
-
-
-
+- [x] Add '참여 신청 바로가기 ↓' smooth anchor button in AboutSection to navigate directly to bottom Contact form (`AboutSection.tsx`) <!-- id: 98 -->

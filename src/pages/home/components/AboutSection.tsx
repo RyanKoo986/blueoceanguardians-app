@@ -10,6 +10,13 @@ export function AboutSection() {
     'KUDA 역할과 활동 소개를 통한 주관 기관 인식 제고'
   ];
 
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section id="about" className="py-24 relative bg-slate-50 border-t border-slate-200">
       <div className="container mx-auto px-6 relative z-10">
@@ -25,10 +32,33 @@ export function AboutSection() {
             <span className="text-brand-cyan-600 text-xs font-mono tracking-[0.3em] uppercase mb-4 block font-bold">
               About Organization
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight tracking-tight break-keep">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight break-keep">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan-600 to-blue-600">대한잠수협회</span>와 함께하는<br />
               독도 수호 캠페인
             </h2>
+
+            {/* Quick Action Anchor Button to Bottom Contact Form */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex justify-center"
+            >
+              <button
+                type="button"
+                onClick={scrollToContact}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all group cursor-pointer border border-sky-400/30 active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                  color: '#ffffff',
+                }}
+                aria-label="하단 참여 신청 폼으로 이동"
+              >
+                <span className="tracking-wide">참여 신청 바로가기</span>
+                <i className="ri-arrow-down-line text-base transition-transform duration-300 group-hover:translate-y-0.5"></i>
+              </button>
+            </motion.div>
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
