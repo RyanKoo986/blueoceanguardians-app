@@ -12,6 +12,7 @@
 - **Internationalization**: i18next, react-i18next
 - **Backend & Database**: Supabase (PostgreSQL 15+, Custom Schema `dokdo_guardians`, Row Level Security, Supabase Storage)
 - **Mobile Packaging (Target)**: Capacitor (`@capacitor/core`, `@capacitor/android`, `@capacitor/ios`)
+- **App Display Name**: `Blue Ocean Guardians` (`capacitor.config.ts` appName, `index.html` title)
 - **AI Engine (GPT-4o)**: OpenAI GPT-4o (`aiService.ts`) for real-time historical fact-checking, distortion correction, text refinement, and summarization with offline fallback.
 - **Authentication & App Policy**:
   - **Biometric Quick Login**: Native Fingerprint & Face ID authentication (`biometricService.ts`) with seamless WebAuthn support and one-click auto-registration.

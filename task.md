@@ -95,3 +95,4 @@
 - [x] Skip home 3s opening intro animation when logged in and on repeat tab clicks (`page.tsx`, `AuthContext`) <!-- id: 96 -->
 - [x] Optimize font rendering with native font smoothing (-webkit-font-smoothing: antialiased, optimizeLegibility) and system font stack (`index.css`) <!-- id: 97 -->
 - [x] Add '참여 신청 바로가기 ↓' smooth anchor button in AboutSection to navigate directly to bottom Contact form (`AboutSection.tsx`) <!-- id: 98 -->
+- [x] Rename app display name to English 'Blue Ocean Guardians' (Capacitor appName) and align web title (`capacitor.config.ts`, `index.html`) <!-- id: 99 -->
