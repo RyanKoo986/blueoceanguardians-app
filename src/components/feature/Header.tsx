@@ -19,6 +19,12 @@ function Header() {
     '/services/ai-fact-check',
     '/services/report',
   ].some((path) => location.pathname === path || location.pathname.startsWith(path));
+  const hasPhotoHero = [
+    '/services/cleanup',
+    '/services/contest',
+    '/services/ai-fact-check',
+    '/services/report',
+  ].some((path) => location.pathname.startsWith(path));
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
@@ -120,7 +126,8 @@ function Header() {
     { to: "/contact", label: "Contact" },
   ];
 
-  const isHeaderWhite = isLightPage;
+  // Photo heroes sit under the transparent header, so keep white text until the header turns opaque
+  const isHeaderWhite = isLightPage && (isScrolled || !hasPhotoHero);
 
   return (
     <>
