@@ -30,6 +30,14 @@
   npm run cap:android   # Android Studio 자동 실행
   ```
 - **빌드 메뉴**: `Build` → `Generate Signed Bundle / APK...` → `Android App Bundle`
+- **업로드 키(Upload Key)**: `C:\Users\USER\keystores\blueoceanguardians\upload-keystore.jks` (alias `upload`, 비밀번호는 같은 폴더 `keystore-info.txt`). 모든 업데이트는 이 키로 서명해야 하므로 폴더째 안전한 곳에 백업.
+- **산출물 위치**: `android/app/build/outputs/bundle/release/app-release.aab`
+- **업데이트 시**: `android/app/build.gradle`의 `versionCode`를 직전 업로드보다 크게 올린 뒤 빌드.
+- **Gradle `PKIX path building failed` 오류**: Norton 백신의 HTTPS 검사(Web/Mail Shield)가 인증서를 자체 루트(`Norton Web/Mail Shield Root`)로 재서명하는데, Android Studio 내장 JDK(JBR)는 이 루트를 신뢰하지 않아 발생. **관리자 권한 PowerShell**에서 아래를 실행해 JBR에 등록 (Android Studio 업데이트 후 재실행 필요):
+  ```powershell
+  Get-ChildItem Cert:\LocalMachine\Root | Where-Object Subject -like '*Norton Web/Mail Shield Root*' | Select-Object -First 1 | Export-Certificate -FilePath "$env:TEMP\norton-root.cer"
+  & "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -importcert -noprompt -alias norton-web-mail-shield -file "$env:TEMP\norton-root.cer" -cacerts -storepass changeit
+  ```
 
 ### 🍎 iOS
 - **Mac 필수**: Windows PC에서는 iOS 앱 컴파일 및 `.ipa` 생성이 기술적으로 불가능합니다 (Macbook, Mac mini 또는 클라우드 Mac 인스턴스 필요).

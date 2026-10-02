@@ -8,7 +8,8 @@
 ## 2. Tech Stack Specs
 - **Frontend Core**: React 18, TypeScript 5, Vite 5
 - **Routing & State**: React Router DOM v6, React Context API (`AuthContext`)
-- **Styling & UI**: TailwindCSS + Vanilla CSS, Lucide React Icons, Framer Motion
+- **Styling & UI**: TailwindCSS v3 compiled at build time via PostCSS (`tailwind.config.js`, `postcss.config.js`, directives in `src/index.css`) + Vanilla CSS, Lucide React Icons, Framer Motion
+  - Custom theme lives in `tailwind.config.js` (`brand-cyan`, `brand-navy`, `font-sans` Noto Sans KR, `animate-fade-in-up`, dark mode via `[data-theme="dark"]`). Never paste precompiled Tailwind output into `index.css` — unlisted classes silently fail.
 - **Internationalization**: i18next, react-i18next
 - **Backend & Database**: Supabase (PostgreSQL 15+, Custom Schema `dokdo_guardians`, Row Level Security, Supabase Storage)
 - **Mobile Packaging (Target)**: Capacitor (`@capacitor/core`, `@capacitor/android`, `@capacitor/ios`)
