@@ -99,8 +99,9 @@
 - [x] Wire Tailwind CSS v3 into the Vite build via PostCSS (`tailwind.config.js`, `postcss.config.js`) and replace the stale precompiled CSS in `index.css`, restoring 261 silently missing classes across 23 files (`index.css`) <!-- id: 100 -->
 - [x] Fix invisible Privacy policy body text (missing `text-slate-300/400` utilities) and update privacy officer to 사단법인 대한잠수협회 / kudaon@daum.net (`Privacy.tsx`) <!-- id: 101 -->
 - [x] Create Google Play upload keystore and build signed release AAB (`android/app/build/outputs/bundle/release/app-release.aab`) <!-- id: 102 -->
-- [ ] Add `jpeg|mp4` to Amplify SPA rewrite rule so `.jpeg`/video assets are not rewritten to `index.html` <!-- id: 103 -->
+- [x] Add `jpeg|mp4` to Amplify SPA rewrite rule so `.jpeg`/video assets are not rewritten to `index.html` <!-- id: 103 -->
 - [x] Restore missing About hero image `public/images/dokdo photo/IMG_20250614_100730_221.jpeg` from blueoceanguardians.org and rebuild signed AAB (`About.tsx`, `archiveService.ts`) <!-- id: 104 -->
-- [ ] Replace placeholder 운영 사무국 contact info (`contact@dokdo.kr`, 테헤란로 123) with real KUDA info (`Contact.tsx`) <!-- id: 105 -->
-- [ ] Decide BottomTabBar label size (now renders the coded `text-[9px]`) (`BottomTabBar.tsx`) <!-- id: 106 -->
-- [ ] Improve header contrast over photo heroes on light pages (contest back button unreadable) (`Header.tsx`) <!-- id: 107 -->
+- [x] Replace placeholder 운영 사무국 contact info with real KUDA email, tel, office address and website; add tel to privacy officer (`Contact.tsx`, `Privacy.tsx`) <!-- id: 105 -->
+- [x] Raise BottomTabBar label size from 9px to 11px for readability (`BottomTabBar.tsx`) <!-- id: 106 -->
+- [x] Keep header text white over photo heroes (cleanup, contest, ai-fact-check, report) until scrolled (`Header.tsx`) <!-- id: 107 -->
+- [x] Clean previous Android outputs and rebuild signed release AAB with all fixes <!-- id: 108 -->
