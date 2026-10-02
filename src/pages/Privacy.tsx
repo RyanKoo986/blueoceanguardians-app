@@ -116,8 +116,8 @@ export const PrivacyPage: React.FC = () => {
               6. 개인정보 보호책임자 및 문의처
             </h2>
             <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40 text-sm space-y-1">
-              <p><span className="text-slate-500">책임자/운영팀:</span> <span className="text-white">블루오션 가디언스 운영국</span></p>
-              <p><span className="text-slate-500">이메일:</span> <span className="text-blue-400">contact@blueoceanguardians.org</span></p>
+              <p><span className="text-slate-500">책임자/운영팀:</span> <span className="text-white">사단법인 대한잠수협회</span></p>
+              <p><span className="text-slate-500">이메일:</span> <span className="text-blue-400">kudaon@daum.net</span></p>
               <p className="text-xs text-slate-500 mt-2">개인정보 열람청구 및 불만처리 관련 사항은 상기 이메일로 접수해 주시면 신속히 처리해 드립니다.</p>
             </div>
           </section>
