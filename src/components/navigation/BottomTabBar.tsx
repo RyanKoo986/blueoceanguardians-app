@@ -179,7 +179,7 @@ export function BottomTabBar() {
                 </div>
 
                 <span 
-                  className={`relative z-10 text-[9px] mt-0.5 tracking-tight leading-none pointer-events-none transition-colors duration-200 ${
+                  className={`relative z-10 text-[11px] mt-0.5 tracking-tight leading-none pointer-events-none transition-colors duration-200 ${
                     active 
                       ? 'font-bold text-black' 
                       : 'font-medium text-gray-500 group-hover:text-gray-900'
