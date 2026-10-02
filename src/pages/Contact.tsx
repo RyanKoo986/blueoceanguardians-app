@@ -104,10 +104,21 @@ export default function Contact() {
                     EMAIL
                   </span>
                   <a
-                    href="mailto:contact@dokdo.kr"
+                    href="mailto:kudaon@daum.net"
                     className="text-gray-700 font-medium hover:text-blue-600 transition-colors"
                   >
-                    contact@dokdo.kr
+                    kudaon@daum.net
+                  </a>
+                </div>
+                <div>
+                  <span className="block text-[11px] font-bold text-blue-600 tracking-wider mb-1 uppercase">
+                    TEL
+                  </span>
+                  <a
+                    href="tel:02-425-5800"
+                    className="text-gray-700 font-medium hover:text-blue-600 transition-colors"
+                  >
+                    02-425-5800
                   </a>
                 </div>
                 <div>
@@ -115,8 +126,21 @@ export default function Contact() {
                     OFFICE
                   </span>
                   <p className="text-gray-700 font-medium leading-snug">
-                    서울특별시 강남구 테헤란로 123
+                    경기도 고양시 덕양구 삼원로 73, 1020호
                   </p>
+                </div>
+                <div>
+                  <span className="block text-[11px] font-bold text-blue-600 tracking-wider mb-1 uppercase">
+                    WEBSITE
+                  </span>
+                  <a
+                    href="https://www.kuda.or.kr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 font-medium hover:text-blue-600 transition-colors"
+                  >
+                    www.kuda.or.kr
+                  </a>
                 </div>
               </div>
             </div>
