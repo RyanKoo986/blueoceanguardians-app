@@ -117,6 +117,7 @@ export const PrivacyPage: React.FC = () => {
             </h2>
             <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40 text-sm space-y-1">
               <p><span className="text-slate-500">책임자/운영팀:</span> <span className="text-white">사단법인 대한잠수협회</span></p>
+              <p><span className="text-slate-500">연락처:</span> <span className="text-white">02-425-5800</span></p>
               <p><span className="text-slate-500">이메일:</span> <span className="text-blue-400">kudaon@daum.net</span></p>
               <p className="text-xs text-slate-500 mt-2">개인정보 열람청구 및 불만처리 관련 사항은 상기 이메일로 접수해 주시면 신속히 처리해 드립니다.</p>
             </div>
