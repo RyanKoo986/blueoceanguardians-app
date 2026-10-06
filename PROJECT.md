@@ -14,7 +14,7 @@
 - **Backend & Database**: Supabase (PostgreSQL 15+, Custom Schema `dokdo_guardians`, Row Level Security, Supabase Storage)
 - **Mobile Packaging (Target)**: Capacitor (`@capacitor/core`, `@capacitor/android`, `@capacitor/ios`)
 - **App Display Name**: `Blue Guardians` (`capacitor.config.ts` appName, `index.html` title)
-- **AI Engine (GPT-4o)**: OpenAI GPT-4o (`aiService.ts`) for real-time historical fact-checking, distortion correction, text refinement, and summarization with offline fallback.
+- **AI Engine (GPT-4o)**: OpenAI GPT-4o called only from the Supabase Edge Function `dokdo-ai` (`supabase/functions/dokdo-ai/index.ts`, secret `OPENAI_API_KEY`, fixed tasks `factcheck`/`refine`/`expand`/`summarize`, max 5,000 chars); `aiService.ts` invokes it via `supabase.functions.invoke`. Never put the OpenAI key in a `VITE_*` variable. Deploy function changes by pasting the file into Dashboard > Edge Functions > dokdo-ai. `supabase/functions/tsconfig.json` + `deno-globals.d.ts` give VS Code Deno typings without the Deno extension (verify with `npx deno check supabase/functions/dokdo-ai/index.ts`). for real-time historical fact-checking, distortion correction, text refinement, and summarization with offline fallback.
 - **Authentication & App Policy**:
   - **Guest Access**: All articles, research archive, fact checks, citizen error reports, and cleanup applications are accessible without forced login.
   - **Role-based Permissions**: `ADMIN` role for official archive posts, notice publishing, and report moderation.
@@ -50,6 +50,7 @@ Custom schema `dokdo_guardians` is used for total isolation:
 - `archive_files` / `archive_comments`: follow parent post visibility; comments require login.
 - `reports`, `cleanup_requests`, `contacts` (+ file tables): anyone can insert, only admins read/update/delete. Clients generate the row id (`crypto.randomUUID()`) because submitters cannot read rows back.
 - Storage `guardians-storage`: public read and upload, update/delete admin only.
+- Uploads go through `src/lib/storageUpload.ts` only: images are resized client-side (`optimizeImage.ts`: longest side 2000px, JPEG 85%, EXIF/GPS stripped; GIF/undecodable files unchanged), storage keys are generated ASCII names (Supabase rejects Korean keys; the original name is kept in the `name` column), and the per-file limit is 50MB (Supabase free plan). Services return the names of files that failed so pages can tell the user.
 - Signup duplicate check uses RPC `email_exists()` instead of reading `profiles`.
 
 ---

@@ -1,4 +1,5 @@
-import { supabase, isSupabaseConfigured, STORAGE_BUCKET } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { uploadFiles } from '../lib/storageUpload';
 
 export interface CreateCleanupData {
   name: string;
@@ -27,7 +28,8 @@ export interface CleanupItem {
 const LOCAL_STORAGE_KEY = 'dokdo_cleanup_requests';
 
 export const cleanupService = {
-  async createCleanup(data: CreateCleanupData): Promise<void> {
+  // Returns the names of attachments that could not be uploaded
+  async createCleanup(data: CreateCleanupData): Promise<string[]> {
     if (isSupabaseConfigured && supabase) {
       // Applicants cannot read requests back (admin-only RLS), so the id is generated here
       const cleanupId = crypto.randomUUID();
@@ -43,29 +45,11 @@ export const cleanupService = {
         throw new Error(error.message || '신청 제출에 실패했습니다.');
       }
 
-      if (data.files && data.files.length > 0) {
-        for (const file of data.files) {
-          const filePath = `cleanup/${cleanupId}/${Date.now()}_${file.name}`;
-          const { error: uploadErr } = await supabase.storage
-            .from(STORAGE_BUCKET)
-            .upload(filePath, file);
-
-          if (!uploadErr) {
-            const { data: urlData } = supabase.storage
-              .from(STORAGE_BUCKET)
-              .getPublicUrl(filePath);
-
-            await supabase.from('cleanup_files').insert({
-              cleanup_id: cleanupId,
-              name: file.name,
-              filename: filePath,
-              size: file.size,
-              url: urlData.publicUrl,
-            });
-          }
-        }
+      const { uploaded, failedNames } = await uploadFiles(`cleanup/${cleanupId}`, data.files ?? []);
+      if (uploaded.length > 0) {
+        await supabase.from('cleanup_files').insert(uploaded.map((file) => ({ cleanup_id: cleanupId, ...file })));
       }
-      return;
+      return failedNames;
     }
 
     const items = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '[]');
@@ -78,6 +62,7 @@ export const cleanupService = {
     };
     items.unshift(newItem);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
+    return [];
   },
 
   async getCleanups(): Promise<CleanupItem[]> {

@@ -1,3 +1,5 @@
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+
 export interface FactCheckIssue {
   original: string;
   reason: string;
@@ -9,114 +11,44 @@ export interface FactCheckResponse {
   explanation: string;
 }
 
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+type AiTask = 'factcheck' | 'refine' | 'expand' | 'summarize';
+
+// Must match MAX_CONTENT_LENGTH in supabase/functions/dokdo-ai
+const AI_MAX_CONTENT_LENGTH = 5000;
+
+const assertContent = (content: string) => {
+  if (!content.trim()) throw new Error('내용을 입력해주세요.');
+  if (content.length > AI_MAX_CONTENT_LENGTH) {
+    throw new Error(`AI 분석은 ${AI_MAX_CONTENT_LENGTH}자 이하의 내용만 가능합니다.`);
+  }
+};
+
+// OpenAI runs inside the "dokdo-ai" Edge Function so the API key never ships to the client.
+// Returns null when the function is unavailable so callers can use the offline engine.
+const runAiTask = async <T>(task: AiTask, content: string): Promise<T | null> => {
+  if (!isSupabaseConfigured || !supabase) return null;
+  const { data, error } = await supabase.functions.invoke<{ result: T }>('dokdo-ai', {
+    body: { task, content },
+  });
+  if (error || !data) {
+    console.warn('AI function failed, using offline engine:', error);
+    return null;
+  }
+  return data.result;
+};
 
 export const aiService = {
   // GPT-4o 팩트체크 및 역사적 교정
   async factCheck(content: string): Promise<FactCheckResponse> {
-    if (!content.trim()) {
-      throw new Error('분석할 내용을 입력해주세요.');
-    }
-
-    if (OPENAI_API_KEY) {
-      try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${OPENAI_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o',
-            messages: [
-              {
-                role: 'system',
-                content: `당신은 대한민국 독도 및 동해 해양 역사·국제법 전문 AI 팩트체커입니다.
-입력된 문장에서 독도(Dokdo) 왜곡(예: 리앙쿠르 암초/Liancourt Rocks, 다케시마/Takeshima, 분쟁 지역 표기, 일본 영유권 주장 등)과 동해(East Sea) 왜곡(일본해 단독 표기 등)을 정밀 분석하세요.
-
-[핵심 검증 규칙]
-1. 독도나 동해에 관한 명백한 역사적·국제법적 오류 또는 왜곡 표현이 실제로 존재하는 경우에만 "issues" 배열에 추가하고, "correctedContent"에 교정본을 제공하세요.
-2. 왜곡 표현이 없거나, 일반적인 일상/환경/학술 글인 경우 텍스트를 임의로 수정하거나 꼬리말/요약문을 추가하지 마십시오. 반드시 "issues": [] (빈 배열)을 반환하고 "correctedContent"는 사용자의 입력 원문과 100% 동일하게 유지해야 합니다.
-
-반드시 아래 JSON 형식으로만 응답해야 합니다 (마크다운 코드블록 없이 순수 JSON):
-{
-  "issues": [
-    {
-      "original": "왜곡된 원문 문구",
-      "reason": "역사적/국제법적 오류 이유 및 반박 근거 (대한제국 칙령 제41호, 샌프란시스코 강화조약 등)"
-    }
-  ],
-  "correctedContent": "교정된 완성형 문장 (오류가 없으면 원문 그대로)",
-  "explanation": "분석 요약 (오류가 없으면 '역사적 왜곡이나 오류가 발견되지 않은 안전한 서술입니다.')"
-}`,
-              },
-              {
-                role: 'user',
-                content: content,
-              },
-            ],
-            temperature: 0.1,
-            response_format: { type: 'json_object' },
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.warn('OpenAI API call failed, falling back to local engine:', errorData);
-          return this.getLocalFactCheck(content);
-        }
-
-        const data = await response.json();
-        const parsed: FactCheckResponse = JSON.parse(data.choices[0].message.content);
-        return parsed;
-      } catch (err) {
-        console.warn('OpenAI request error, using fallback:', err);
-        return this.getLocalFactCheck(content);
-      }
-    }
-
-    // 데모/오프라인 모드 스마트 분석 엔진
-    return this.getLocalFactCheck(content);
+    assertContent(content);
+    return (await runAiTask<FactCheckResponse>('factcheck', content)) ?? this.getLocalFactCheck(content);
   },
 
   // GPT-4o 글 다듬기 / 요약 / 확장
   async refineText(content: string, mode: 'refine' | 'expand' | 'summarize'): Promise<string> {
-    if (!content.trim()) {
-      throw new Error('내용을 입력해주세요.');
-    }
-
-    const systemPrompts = {
-      refine: '당신은 독도 및 해양 생태계 전문 에디터입니다. 원문의 고유한 내용과 사실을 해치지 않고 오탈자와 문맥, 가독성만을 깔끔하고 품격 있게 다듬어주세요.',
-      expand: '당신은 해양 보전 전문가입니다. 입력된 글의 핵심 아이디어를 바탕으로 풍부한 배경 지식과 구체적인 설명을 더해 전문적인 글로 확장해주세요.',
-      summarize: '당신은 문서 요약 전문가입니다. 핵심 사실과 중요 활동 내용을 3~4줄 내외로 명확하게 요약해주세요.',
-    };
-
-    if (OPENAI_API_KEY) {
-      try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${OPENAI_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o',
-            messages: [
-              { role: 'system', content: systemPrompts[mode] },
-              { role: 'user', content },
-            ],
-            temperature: 0.5,
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          return data.choices[0].message.content;
-        }
-      } catch (err) {
-        console.warn('OpenAI refine error, falling back:', err);
-      }
-    }
+    assertContent(content);
+    const refined = await runAiTask<string>(mode, content);
+    if (refined) return refined;
 
     // 오프라인/데모 폴백
     if (mode === 'summarize') {

@@ -123,7 +123,6 @@ VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 VITE_SUPABASE_SCHEMA=dokdo_guardians
 VITE_SUPABASE_STORAGE_BUCKET=guardians-storage
-VITE_OPENAI_API_KEY=sk-proj-...        # Optional — runs in mock mode if omitted
 ```
 
 | Variable | Description | Where to find |
@@ -132,9 +131,8 @@ VITE_OPENAI_API_KEY=sk-proj-...        # Optional — runs in mock mode if omitt
 | `VITE_SUPABASE_ANON_KEY` | Public anon key | Dashboard → Project Settings → API → `anon public` |
 | `VITE_SUPABASE_SCHEMA` | Custom DB schema name | Default: `dokdo_guardians` |
 | `VITE_SUPABASE_STORAGE_BUCKET` | Storage bucket name | Create in Supabase Storage (public bucket) |
-| `VITE_OPENAI_API_KEY` | OpenAI secret key | [platform.openai.com](https://platform.openai.com) → API Keys |
 
-> **Note:** If `VITE_OPENAI_API_KEY` is omitted, the AI fact-check feature automatically falls back to a local mock engine — the rest of the app works normally.
+> **Note:** The OpenAI key is **not** a client variable. It is stored as the Supabase Edge Function secret `OPENAI_API_KEY` and used only by `supabase/functions/dokdo-ai`. If the function is unavailable, the AI fact-check feature falls back to a local mock engine — the rest of the app works normally.
 
 ---
 

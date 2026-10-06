@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sparkles, Send, Upload, X, Check, Globe, Lock, RefreshCw, FileText } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { aiService, type FactCheckResponse } from '../../services/aiService';
+import { MAX_IMAGE_SOURCE_BYTES, MAX_UPLOAD_BYTES, failedUploadMessage } from '../../lib/storageUpload';
 import { archiveService } from '../../services/archiveService';
 
 export default function AIFactCheck() {
@@ -30,13 +31,13 @@ export default function AIFactCheck() {
     const validFiles = selected.filter((file) => {
       const isImage = file.type.startsWith('image/');
       const isVideo = file.type.startsWith('video/');
-      if (isImage) return file.size <= 20 * 1024 * 1024;
-      if (isVideo) return file.size <= 100 * 1024 * 1024;
+      if (isImage) return file.size <= MAX_IMAGE_SOURCE_BYTES;
+      if (isVideo) return file.size <= MAX_UPLOAD_BYTES;
       return false;
     });
 
     if (validFiles.length !== selected.length) {
-      alert('이미지(최대 20MB) 또는 동영상(최대 100MB) 파일만 첨부할 수 있습니다.');
+      alert('이미지(최대 20MB) 또는 동영상(최대 50MB) 파일만 첨부할 수 있습니다.');
     }
 
     setFiles((prev) => [...prev, ...validFiles]);
@@ -88,7 +89,7 @@ export default function AIFactCheck() {
 
     try {
       setSubmitting(true);
-      await archiveService.createPost(boardType, {
+      const { failedFiles } = await archiveService.createPost(boardType, {
         title: title.trim(),
         content: content.trim(),
         authorId: user?.id || 'guest',
@@ -97,7 +98,9 @@ export default function AIFactCheck() {
         files,
       });
 
-      alert('독도 자료가 성공적으로 등록되었습니다.');
+      alert(failedFiles.length ? `독도 자료가 등록되었습니다.
+
+${failedUploadMessage(failedFiles)}` : '독도 자료가 성공적으로 등록되었습니다.');
       navigate(`/archive?tab=${boardType}`);
     } catch (err: any) {
       alert(err.message || '게시글 등록에 실패했습니다.');
@@ -364,7 +367,7 @@ export default function AIFactCheck() {
                     />
                   </label>
                   <span className="text-xs text-gray-500">
-                    사진 최대 20MB (JPG/PNG/GIF), 동영상 최대 100MB (MP4/WebM)
+                    사진 최대 20MB (JPG/PNG/GIF, 자동 압축), 동영상 최대 50MB (MP4/WebM)
                   </span>
                 </div>
 

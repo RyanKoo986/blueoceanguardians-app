@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Send, CheckCircle, Upload, X } from 'lucide-react';
 import { reportService } from '../../services/reportService';
+import { failedUploadMessage } from '../../lib/storageUpload';
 
 export default function Report() {
   const [submitted, setSubmitted] = useState(false);
@@ -27,7 +28,8 @@ export default function Report() {
     const description = (form.elements.namedItem('description') as HTMLTextAreaElement).value;
 
     try {
-      await reportService.createReport({ url, description, files });
+      const failedFiles = await reportService.createReport({ url, description, files });
+      if (failedFiles.length) alert(failedUploadMessage(failedFiles));
       setSubmitted(true);
       form.reset();
       setFiles([]);
@@ -159,7 +161,7 @@ export default function Report() {
                             id="report-file-upload"
                           />
                           <span className="text-xs text-gray-500">
-                            이미지(PNG, JPG) 및 문서 파일 업로드 가능
+                            이미지(PNG, JPG) 및 문서 파일 업로드 가능 (파일당 최대 50MB)
                           </span>
                         </div>
 
