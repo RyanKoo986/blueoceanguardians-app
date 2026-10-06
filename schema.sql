@@ -390,12 +390,9 @@ GRANT EXECUTE ON FUNCTION dokdo_guardians.delete_my_account() TO authenticated;
 GRANT EXECUTE ON FUNCTION dokdo_guardians.admin_delete_user(uuid) TO authenticated;
 
 -- 7. Initial Seed Data
-INSERT INTO dokdo_guardians.profiles (id, email, name, role, affiliation, license_grade)
-VALUES 
-    ('00000000-0000-0000-0000-000000000001', 'admin@blueoceanguardians.org', '관리자', 'ADMIN', '블루오션 가디언스 본부', '마스터'),
-    ('00000000-0000-0000-0000-000000000002', 'researcher@dokdo.re.kr', '김해양 연구원', 'RESEARCHER', '독도해양연구소', '수석연구원')
-ON CONFLICT (id) DO NOTHING;
-
+-- Profiles are not seeded: each profile must belong to a Supabase Auth login (created via signup).
+-- To create an admin, sign up in the app, then run:
+--   UPDATE dokdo_guardians.profiles SET role = 'ADMIN' WHERE email = '<admin email>';
 INSERT INTO dokdo_guardians.archive_posts (id, board_type, title, content, author_id, author_name, visibility, views, category, is_important)
 VALUES 
     (
@@ -403,7 +400,7 @@ VALUES
         'research',
         '2026년 상반기 독도 연안 해양생태계 종합 모니터링 결과 보고',
         '독도 주변 해역의 수온 변화 및 아열대성 어종 출현 빈도에 대한 정밀 조사 결과 보고서입니다. 해조류 서식 환경 개선을 위한 지속적인 보전 활동이 필요합니다.',
-        '00000000-0000-0000-0000-000000000002',
+        NULL,
         '김해양 연구원',
         'public',
         142,
@@ -415,7 +412,7 @@ VALUES
         'notice',
         '제4회 독도 바다정화 및 플로깅 자원봉사자 모집 안내',
         '깨끗한 독도 바다를 만들기 위한 2026년 봄맞이 해양 정화 캠페인이 시작됩니다. 많은 가디언스 여러분의 참여를 기다립니다.',
-        '00000000-0000-0000-0000-000000000001',
+        NULL,
         '관리자',
         'public',
         389,
@@ -430,7 +427,7 @@ VALUES
     (
         '33333333-3333-3333-3333-333333333331',
         '22222222-2222-2222-2222-222222222222',
-        '00000000-0000-0000-0000-000000000002',
+        NULL,
         '김해양 연구원',
         '이번 정화 활동에 연구소 팀원들과 함께 신청 완료했습니다!'
     )
