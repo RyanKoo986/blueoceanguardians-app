@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Send, CheckCircle, Upload, X } from 'lucide-react';
 
 import { cleanupService } from '../../services/cleanupService';
+import { failedUploadMessage } from '../../lib/storageUpload';
 
 export default function Cleanup() {
   const [submitted, setSubmitted] = useState(false);
@@ -30,7 +31,8 @@ export default function Cleanup() {
     const message = (form.elements.namedItem('message') as HTMLTextAreaElement).value;
 
     try {
-      await cleanupService.createCleanup({ name, contact, region, message, files });
+      const failedFiles = await cleanupService.createCleanup({ name, contact, region, message, files });
+      if (failedFiles.length) alert(failedUploadMessage(failedFiles));
       setSubmitted(true);
       form.reset();
       setFiles([]);
@@ -181,7 +183,7 @@ export default function Cleanup() {
                                   className="hidden"
                                   id="cleanup-file-upload"
                                 />
-                                <span className="text-xs text-gray-500">이미지 / 영상 파일 업로드 가능 (선택)</span>
+                                <span className="text-xs text-gray-500">이미지 / 영상 파일 업로드 가능 (선택, 파일당 최대 50MB)</span>
                              </div>
 
                              {files.length > 0 && (

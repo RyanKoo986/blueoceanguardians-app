@@ -1,4 +1,5 @@
-import { supabase, isSupabaseConfigured, STORAGE_BUCKET } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { uploadFiles } from '../lib/storageUpload';
 
 export interface ArchiveFile {
   name: string;
@@ -31,6 +32,12 @@ export interface ArchivePost {
   boardType?: string;
   isImportant?: boolean;
   comments?: ArchiveComment[];
+}
+
+// Result of creating/updating a post; failedFiles lists attachments that could not be uploaded
+export interface SavedPost {
+  post: ArchivePost;
+  failedFiles: string[];
 }
 
 export interface CreatePostData {
@@ -309,7 +316,7 @@ export const archiveService = {
     return post;
   },
 
-  async createPost(boardType: string, data: CreatePostData): Promise<ArchivePost> {
+  async createPost(boardType: string, data: CreatePostData): Promise<SavedPost> {
     if (isSupabaseConfigured && supabase) {
       if (!['notice', 'dokdo', 'cleanup'].includes(boardType)) {
         throw new Error('알 수 없는 게시판입니다.');
@@ -333,37 +340,12 @@ export const archiveService = {
         throw new Error(error.message || '게시글 작성에 실패했습니다.');
       }
 
-      // 파일 업로드 처리
-      const uploadedFiles: ArchiveFile[] = [];
-      if (data.files && data.files.length > 0) {
-        for (const file of data.files) {
-          const filePath = `archive/${post.id}/${Date.now()}_${file.name}`;
-          const { error: uploadErr } = await supabase.storage
-            .from(STORAGE_BUCKET)
-            .upload(filePath, file);
-
-          if (!uploadErr) {
-            const { data: urlData } = supabase.storage
-              .from(STORAGE_BUCKET)
-              .getPublicUrl(filePath);
-
-            const fileRecord: ArchiveFile = {
-              name: file.name,
-              filename: filePath,
-              size: file.size,
-              url: urlData.publicUrl,
-            };
-
-            await supabase.from('archive_files').insert({
-              post_id: post.id,
-              ...fileRecord,
-            });
-            uploadedFiles.push(fileRecord);
-          }
-        }
+      const { uploaded, failedNames } = await uploadFiles(`archive/${post.id}`, data.files ?? []);
+      if (uploaded.length > 0) {
+        await supabase.from('archive_files').insert(uploaded.map((file) => ({ post_id: post.id, ...file })));
       }
 
-      return {
+      const savedPost: ArchivePost = {
         id: post.id,
         title: post.title,
         content: post.content,
@@ -375,9 +357,10 @@ export const archiveService = {
         isImportant: false,
         createdAt: now,
         updatedAt: now,
-        files: uploadedFiles,
+        files: uploaded,
         comments: [],
       };
+      return { post: savedPost, failedFiles: failedNames };
     }
 
     const posts = getLocalPosts();
@@ -403,14 +386,14 @@ export const archiveService = {
     };
     posts.unshift(newPost);
     saveLocalPosts(posts);
-    return newPost;
+    return { post: newPost, failedFiles: [] };
   },
 
   async updatePost(
     boardType: string,
     id: string,
     data: Partial<CreatePostData>,
-  ): Promise<ArchivePost> {
+  ): Promise<SavedPost> {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
     if (isSupabaseConfigured && supabase && isUuid) {
@@ -430,31 +413,12 @@ export const archiveService = {
         .single();
 
       if (!error && updated) {
-        // 새 파일이 추가된 경우 업로드 처리
-        if (data.files && data.files.length > 0) {
-          for (const file of data.files) {
-            const filePath = `archive/${id}/${Date.now()}_${file.name}`;
-            const { error: uploadErr } = await supabase.storage
-              .from(STORAGE_BUCKET)
-              .upload(filePath, file);
-
-            if (!uploadErr) {
-              const { data: urlData } = supabase.storage
-                .from(STORAGE_BUCKET)
-                .getPublicUrl(filePath);
-
-              await supabase.from('archive_files').insert({
-                post_id: id,
-                name: file.name,
-                filename: filePath,
-                size: file.size,
-                url: urlData.publicUrl,
-              });
-            }
-          }
+        const { uploaded, failedNames } = await uploadFiles(`archive/${id}`, data.files ?? []);
+        if (uploaded.length > 0) {
+          await supabase.from('archive_files').insert(uploaded.map((file) => ({ post_id: id, ...file })));
         }
 
-        return this.getPost(boardType, id);
+        return { post: await this.getPost(boardType, id), failedFiles: failedNames };
       }
     }
 
@@ -478,7 +442,7 @@ export const archiveService = {
         updatedAt: new Date().toISOString(),
       };
       saveLocalPosts(posts);
-      return posts[index];
+      return { post: posts[index], failedFiles: [] };
     }
 
     throw new Error('게시글을 찾을 수 없거나 수정에 실패했습니다.');

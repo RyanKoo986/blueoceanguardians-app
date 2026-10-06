@@ -9,6 +9,7 @@ import Aurora from '../home/components/Aurora';
 
 import { archiveService, type ArchivePost, type CreatePostData } from '../../services/archiveService';
 import { aiService } from '../../services/aiService';
+import { MAX_IMAGE_SOURCE_BYTES, MAX_UPLOAD_BYTES, failedUploadMessage } from '../../lib/storageUpload';
 
 type TabType = 'notice' | 'dokdo' | 'cleanup';
 
@@ -137,17 +138,17 @@ export default function ArchivePage() {
     if (!e.target.files) return;
     const selectedFiles = Array.from(e.target.files);
 
-    // 모든 탭에서 이미지/영상 업로드 허용 (이미지 20MB, 영상 100MB)
+    // 모든 탭에서 이미지/영상 업로드 허용 (이미지 원본 20MB → 업로드 시 자동 압축, 영상 50MB)
     const validFiles = selectedFiles.filter(file => {
       const isImage = file.type.startsWith('image/');
       const isVideo = file.type.startsWith('video/');
-      if (isImage) return file.size <= 20 * 1024 * 1024;
-      if (isVideo) return file.size <= 100 * 1024 * 1024;
+      if (isImage) return file.size <= MAX_IMAGE_SOURCE_BYTES;
+      if (isVideo) return file.size <= MAX_UPLOAD_BYTES;
       return false;
     });
 
     if (validFiles.length !== selectedFiles.length) {
-      alert('이미지(JPG, PNG, GIF 등, 최대 20MB) 또는 동영상(MP4, WebM 등, 최대 100MB)만 업로드 가능합니다.');
+      alert('이미지(JPG, PNG, GIF 등, 최대 20MB) 또는 동영상(MP4, WebM 등, 최대 50MB)만 업로드 가능합니다.');
     }
 
     setWriteForm({
@@ -207,20 +208,23 @@ export default function ArchivePage() {
 
     try {
       if (editingPostId) {
-        await archiveService.updatePost(activeTab, editingPostId, {
+        const { failedFiles } = await archiveService.updatePost(activeTab, editingPostId, {
           title: writeForm.title.trim(),
           content: writeForm.content.trim(),
           visibility: writeForm.visibility,
           category: writeForm.category,
           files: writeForm.files,
         });
-        alert('게시글이 수정되었습니다.');
+        alert(failedFiles.length ? `게시글이 수정되었습니다.
+
+${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
       } else {
-        const result = await archiveService.createPost(activeTab, {
+        const { post: result, failedFiles } = await archiveService.createPost(activeTab, {
           ...writeForm,
           authorId: user?.id || '',
           authorName: (user as any)?.nickname || user?.name || user?.id || '가디언즈 회원'
         });
+        if (failedFiles.length) alert(failedUploadMessage(failedFiles));
         setCreatedPost(result);
         setShowShareModal(true);
       }
@@ -859,7 +863,7 @@ export default function ArchivePage() {
                         />
                       </label>
                       <span className="text-xs text-gray-500">
-                        사진 최대 20MB (JPG/PNG/GIF), 동영상 최대 100MB (MP4/WebM)
+                        사진 최대 20MB (JPG/PNG/GIF, 자동 압축), 동영상 최대 50MB (MP4/WebM)
                       </span>
                     </div>
 

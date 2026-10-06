@@ -1,4 +1,5 @@
-import { supabase, isSupabaseConfigured, STORAGE_BUCKET } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { uploadFiles } from '../lib/storageUpload';
 
 export interface CreateReportData {
   url: string;
@@ -23,7 +24,8 @@ export interface ReportItem {
 const LOCAL_STORAGE_KEY = 'dokdo_reports';
 
 export const reportService = {
-  async createReport(data: CreateReportData): Promise<void> {
+  // Returns the names of attachments that could not be uploaded
+  async createReport(data: CreateReportData): Promise<string[]> {
     if (isSupabaseConfigured && supabase) {
       // Submitters cannot read reports back (admin-only RLS), so the id is generated here
       const reportId = crypto.randomUUID();
@@ -37,29 +39,11 @@ export const reportService = {
         throw new Error(error.message || '제보 제출에 실패했습니다.');
       }
 
-      if (data.files && data.files.length > 0) {
-        for (const file of data.files) {
-          const filePath = `reports/${reportId}/${Date.now()}_${file.name}`;
-          const { error: uploadErr } = await supabase.storage
-            .from(STORAGE_BUCKET)
-            .upload(filePath, file);
-
-          if (!uploadErr) {
-            const { data: urlData } = supabase.storage
-              .from(STORAGE_BUCKET)
-              .getPublicUrl(filePath);
-
-            await supabase.from('report_files').insert({
-              report_id: reportId,
-              name: file.name,
-              filename: filePath,
-              size: file.size,
-              url: urlData.publicUrl,
-            });
-          }
-        }
+      const { uploaded, failedNames } = await uploadFiles(`reports/${reportId}`, data.files ?? []);
+      if (uploaded.length > 0) {
+        await supabase.from('report_files').insert(uploaded.map((file) => ({ report_id: reportId, ...file })));
       }
-      return;
+      return failedNames;
     }
 
     const items = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '[]');
@@ -72,6 +56,7 @@ export const reportService = {
     };
     items.unshift(newItem);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
+    return [];
   },
 
   async getReports(): Promise<ReportItem[]> {
