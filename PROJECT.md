@@ -16,11 +16,11 @@
 - **App Display Name**: `Blue Ocean Guardians` (`capacitor.config.ts` appName, `index.html` title)
 - **AI Engine (GPT-4o)**: OpenAI GPT-4o (`aiService.ts`) for real-time historical fact-checking, distortion correction, text refinement, and summarization with offline fallback.
 - **Authentication & App Policy**:
-  - **Biometric Quick Login**: Native Fingerprint & Face ID authentication (`biometricService.ts`) with seamless WebAuthn support and one-click auto-registration.
   - **Guest Access**: All articles, research archive, fact checks, citizen error reports, and cleanup applications are accessible without forced login.
   - **Role-based Permissions**: `ADMIN` role for official archive posts, notice publishing, and report moderation.
   - **App Store & Play Store Compliance (Privacy Policy)**: Dedicated standalone `/privacy` web route and modal in `FooterSection.tsx` compliant with Google Play Console and App Store guidelines.
-  - **App Store Guideline 5.1.1(v) Compliance**: In-app permanent account deletion (`MyPage.tsx` -> `authService.deleteAccount`) provided for logged-in users.
+  - **Biometric Quick Login (native app only)**: `@capgo/capacitor-native-biometric`. After a password login (or from the MyPage/Admin toggle after re-entering the password), the email/password is stored with `AccessControl.BIOMETRY_ANY` in Android Keystore / iOS Keychain; `getSecureCredentials()` shows a biometric prompt cryptographically bound to decryption, then a normal Supabase `signInWithPassword` runs. Hidden on the web build (`Capacitor.isNativePlatform()`). Invalid stored logins are auto-removed.
+  - **Account Deletion (App Store 5.1.1(v) / Google Play)**: `MyPage.tsx` -> `authService.deleteAccount` -> RPC `delete_my_account()`; admins use the Members tab (`AdminDashboard.tsx`) -> RPC `admin_delete_user()`. Both anonymize the member's posts/comments to '탈퇴한 회원', delete the profile, and delete the `auth.users` login unless another app schema in the shared Supabase project still has a `profiles` row for that user.
   - **App Store Guideline 4.2 Compliance (Native Touch Optimization)**: Global suppression of web callouts (`-webkit-touch-callout: none`), bounce elimination (`overscroll-behavior-y: none`), tap highlight elimination, and selective text copying rules.
 
 ---
@@ -41,6 +41,16 @@ Custom schema `dokdo_guardians` is used for total isolation:
 - **No `ALTER DEFAULT PRIVILEGES`**: Strictly prohibited to avoid unintended global privilege overrides across Supabase system (`auth`, `storage`) or other schemas.
 - **Explicit Direct `GRANT` Only**: Always grant permissions explicitly on the custom schema, its tables, sequences, and routines.
 - **Integrated Storage Initialization**: Storage bucket (`guardians-storage`) creation and storage RLS policies must be maintained directly within `schema.sql`.
+- **Live DB changes go through `migrations/`**: `schema.sql` drops and recreates tables, so never run it on production. Apply incremental, re-runnable SQL files from `migrations/` in the SQL Editor and mirror the same change in `schema.sql`.
+
+### RLS Model (`migrations/2026-10-06_rls_and_account_deletion.sql`)
+- `dokdo_guardians.is_admin()` (SECURITY DEFINER) is the single admin check used by all policies.
+- `profiles`: read/update own row or admin; `role`/`email` changes blocked for non-admins by trigger `protect_profile_fields`; inserts only via RPC `create_my_profile()` (role forced to `USER`).
+- `archive_posts`: public rows readable by all, private rows by author/admin; insert as self or anonymous guest; update/delete by author/admin; view counter via RPC `increment_post_views()`.
+- `archive_files` / `archive_comments`: follow parent post visibility; comments require login.
+- `reports`, `cleanup_requests`, `contacts` (+ file tables): anyone can insert, only admins read/update/delete. Clients generate the row id (`crypto.randomUUID()`) because submitters cannot read rows back.
+- Storage `guardians-storage`: public read and upload, update/delete admin only.
+- Signup duplicate check uses RPC `email_exists()` instead of reading `profiles`.
 
 ---
 

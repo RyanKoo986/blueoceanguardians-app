@@ -105,3 +105,12 @@
 - [x] Raise BottomTabBar label size from 9px to 11px for readability (`BottomTabBar.tsx`) <!-- id: 106 -->
 - [x] Keep header text white over photo heroes (cleanup, contest, ai-fact-check, report) until scrolled (`Header.tsx`) <!-- id: 107 -->
 - [x] Clean previous Android outputs and rebuild signed release AAB with all fixes <!-- id: 108 -->
+- [x] Add account deletion section (web/app MyPage withdrawal, anonymized content notice) to privacy policy for Play Console deletion URL (`Privacy.tsx`, `MyPage.tsx`) <!-- id: 109 -->
+- [x] Make account withdrawal delete the Supabase auth user via RPC and anonymize posts/comments (`authService.ts`, `migrations/`) <!-- id: 110 -->
+- [x] Replace allow-all RLS with admin/owner-scoped policies, block role self-promotion, add signup/view-count/deletion RPCs (`migrations/2026-10-06_rls_and_account_deletion.sql`, `schema.sql`) <!-- id: 111 -->
+- [x] Add admin Members tab with search, role change and forced withdrawal (`AdminDashboard.tsx`, `authService.ts`) <!-- id: 112 -->
+- [x] Restore logged-in user synchronously so guarded pages like /admin survive reloads (`AuthContext.tsx`) <!-- id: 113 -->
+- [ ] Apply `migrations/2026-10-06_rls_and_account_deletion.sql` in the Supabase SQL Editor (live DB) <!-- id: 114 -->
+- [ ] Fix archive board mapping: 'dokdo'/'cleanup' tab posts are stored as board_type 'notice' (`archiveService.ts`, `schema.sql`) <!-- id: 115 -->
+- [x] Replace simulated biometric login with native biometrics (Keystore/Keychain-protected credentials + real Supabase sign-in), hidden on web (`biometricService.ts`, `useBiometricSetting.ts`, `BiometricPasswordModal.tsx`, `Login.tsx`, `MyPage.tsx`, `AdminDashboard.tsx`) <!-- id: 116 -->
+- [ ] Test biometric register/login/disable on a real Android phone (and iOS Face ID) <!-- id: 117 -->

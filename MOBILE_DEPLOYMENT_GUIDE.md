@@ -33,6 +33,10 @@
 - **업로드 키(Upload Key)**: `C:\Users\USER\keystores\blueoceanguardians\upload-keystore.jks` (alias `upload`, 비밀번호는 같은 폴더 `keystore-info.txt`). 모든 업데이트는 이 키로 서명해야 하므로 폴더째 안전한 곳에 백업.
 - **산출물 위치**: `android/app/build/outputs/bundle/release/app-release.aab`
 - **업데이트 시**: `android/app/build.gradle`의 `versionCode`를 직전 업로드보다 크게 올린 뒤 빌드.
+- **Gradle JDK는 21 사용**: Android Studio의 Gradle JDK는 `temurin-21`로 설정되어 있음(`Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK`). 명령줄로 `gradlew`를 실행할 때는 `JAVA_HOME`을 JDK 21로 지정해야 함. Android Studio 내장 JDK(Java 25)로는 Gradle 8.14.3이 `Unsupported class file major version 69`로 실패.
+- **생체 인증 네이티브 설정** (`android/`, `ios/`는 git 미포함이므로 `npx cap add`로 다시 만들면 재적용 필요):
+  - `android/app/src/main/AndroidManifest.xml`: `<uses-permission android:name="android.permission.USE_BIOMETRIC" />`
+  - `ios/App/App/Info.plist`: `NSFaceIDUsageDescription` (없으면 Face ID 기기에서 앱 종료)
 - **Gradle `PKIX path building failed` 오류**: Norton 백신의 HTTPS 검사(Web/Mail Shield)가 인증서를 자체 루트(`Norton Web/Mail Shield Root`)로 재서명하는데, Android Studio 내장 JDK(JBR)는 이 루트를 신뢰하지 않아 발생. **관리자 권한 PowerShell**에서 아래를 실행해 JBR에 등록 (Android Studio 업데이트 후 재실행 필요):
   ```powershell
   Get-ChildItem Cert:\LocalMachine\Root | Where-Object Subject -like '*Norton Web/Mail Shield Root*' | Select-Object -First 1 | Export-Certificate -FilePath "$env:TEMP\norton-root.cer"
