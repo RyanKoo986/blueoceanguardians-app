@@ -125,6 +125,8 @@ function Header() {
     },
     { to: "/contact", label: "Contact" },
   ];
+  // Desktop shows Contact as the highlighted button on the right instead
+  const desktopMenuItems = menuItems.filter((item) => item.to !== "/contact");
 
   // Photo heroes sit under the transparent header, so keep white text until the header turns opaque
   const isHeaderWhite = isLightPage && (isScrolled || !hasPhotoHero);
@@ -262,7 +264,7 @@ function Header() {
 
             {/* Desktop Navigation - Center */}
             <nav className="flex items-center space-x-0.5 lg:space-x-1 flex-1 justify-center min-w-0">
-              {menuItems.map((item, idx) => (
+              {desktopMenuItems.map((item, idx) => (
                 <div key={idx} className="relative group flex-shrink-0">
                   {item.type === 'scroll' ? (
                     <button
