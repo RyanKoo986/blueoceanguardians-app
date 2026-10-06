@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Shield, Award, Phone, MapPin, LogOut, Trash2, AlertTriangle, MessageSquare, Waves, ChevronRight, Fingerprint, Scan } from 'lucide-react';
+import { User, Mail, Shield, Award, Phone, MapPin, LogOut, Trash2, AlertTriangle, Fingerprint, Scan } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { biometricLabel } from '../services/biometricService';
 import { useBiometricSetting } from '../hooks/useBiometricSetting';

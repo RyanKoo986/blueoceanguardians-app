@@ -7,11 +7,11 @@ import { aiService, type FactCheckResponse } from '../../services/aiService';
 import { archiveService } from '../../services/archiveService';
 
 export default function AIFactCheck() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
-  const [boardType, setBoardType] = useState<'dokdo' | 'cleanup' | 'research' | 'notice'>('dokdo');
+  const [boardType, setBoardType] = useState<'dokdo' | 'cleanup' | 'notice'>('dokdo');
   const [authorName, setAuthorName] = useState(user?.name || (user?.id ? user.id : '독도 가디언'));
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [content, setContent] = useState('');
@@ -185,7 +185,7 @@ export default function AIFactCheck() {
                 >
                   <option value="dokdo">독도 자료</option>
                   <option value="cleanup">수중 정화 활동</option>
-                  <option value="notice">공지사항</option>
+                  {isAdmin && <option value="notice">공지사항</option>}
                 </select>
               </div>
 
@@ -292,7 +292,7 @@ export default function AIFactCheck() {
 
             {/* AI Result Banner (If analyzed) */}
             {aiResult && (
-              <div className="p-4 sm:p-5 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl border border-blue-200 space-y-3.5 animate-fadeIn">
+              <div className="p-4 sm:p-5 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl border border-blue-200 space-y-3.5 animate-fade-in">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <h3 className="text-xs sm:text-sm font-bold text-blue-950 flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />

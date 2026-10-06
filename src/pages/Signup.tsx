@@ -318,7 +318,7 @@ const Signup = () => {
               </button>
 
               {showOptionalFields && (
-                <div className="space-y-3 pt-2 bg-slate-50 p-3.5 rounded-xl border border-gray-200/80 animate-in fade-in duration-200">
+                <div className="space-y-3 pt-2 bg-slate-50 p-3.5 rounded-xl border border-gray-200/80">
                   <div>
                     <label htmlFor="birthDate" className="block text-xs font-bold text-gray-600 mb-1">
                       생년월일 (선택)

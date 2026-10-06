@@ -1,6 +1,6 @@
 # 📱 Android vs iOS 배포 및 운영 가이드 비교
 
-블루오션 가디언스(Capacitor 기반 크로스 플랫폼 앱)의 **Google Play Store(Android)** 와 **Apple App Store(iOS)** 배포 및 운영 차이점을 정리한 가이드 문서입니다.
+블루 가디언즈(Capacitor 기반 크로스 플랫폼 앱)의 **Google Play Store(Android)** 와 **Apple App Store(iOS)** 배포 및 운영 차이점을 정리한 가이드 문서입니다.
 
 ---
 

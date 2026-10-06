@@ -60,10 +60,10 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-lg md:text-xl text-gray-100 font-normal max-w-3xl mx-auto mb-10 leading-relaxed break-keep"
+          className="text-base sm:text-lg md:text-xl text-gray-100 font-normal max-w-3xl mx-auto mb-10 leading-relaxed break-keep"
         >
-          AI 기술로 만나는 독도와 해양,<br />
-          여러분의 따뜻한 관심이 필요합니다.
+          쿠다(KUDA)와 함께 독도를 지키는 블루가디언즈,<br />
+          AI 기술로 만나는 독도와 해양에 여러분의 따뜻한 관심이 필요합니다.
         </motion.p>
 
         {/* CTA Buttons - Standard Box Style - No Gradient */}

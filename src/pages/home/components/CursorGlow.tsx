@@ -14,7 +14,7 @@ export function CursorGlow() {
 
   return (
     <div
-      className="fixed pointer-events-none z-30 w-96 h-96 rounded-full opacity-30 mixed-blend-screen"
+      className="fixed pointer-events-none z-30 w-96 h-96 rounded-full opacity-30 mix-blend-screen"
       style={{
         background: 'radial-gradient(circle, rgba(147, 51, 234, 0.35) 0%, rgba(59, 130, 246, 0.25) 50%, transparent 70%)',
         filter: 'blur(40px)',
