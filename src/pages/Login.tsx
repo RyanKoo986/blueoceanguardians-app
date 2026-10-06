@@ -271,7 +271,7 @@ const Login = () => {
       {/* 팝업 모달 1: 최초 로그인 성공 시 생체 인증 등록 권유 */}
       {pendingCredentials && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl border border-gray-100">
             <div className="flex items-center justify-between">
               <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
                 <Fingerprint className="w-6 h-6" />
@@ -317,7 +317,7 @@ const Login = () => {
       {/* 팝업 모달 2: 비밀번호 찾기 (이메일 재설정 링크 발송) */}
       {showForgotModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl border border-gray-100">
             <div className="flex items-center justify-between">
               <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
                 <KeyRound className="w-5 h-5" />

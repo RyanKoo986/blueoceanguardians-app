@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Project: Dokdo Ocean Guardians (블루오션 가디언스)
+-- Project: Blue Guardians (블루 가디언즈)
 -- Database: PostgreSQL (Supabase Compatible)
 -- Schema: dokdo_guardians
 -- Description: 독도 및 해양 수호 활동, 아카이브, 정화활동 신청, 오염 제보, 회원 관리 스키마
@@ -45,7 +45,7 @@ CREATE TABLE dokdo_guardians.profiles (
 -- [Archive Posts] 독도 연구 자료, 보도자료, 활동 보고 게시글
 CREATE TABLE dokdo_guardians.archive_posts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    board_type TEXT NOT NULL CHECK (board_type IN ('research', 'press', 'notice', 'activity', 'default')),
+    board_type TEXT NOT NULL CHECK (board_type IN ('notice', 'dokdo', 'cleanup', 'research', 'press', 'activity', 'default')),
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     author_id UUID REFERENCES dokdo_guardians.profiles(id) ON DELETE SET NULL,
@@ -204,11 +204,15 @@ CREATE POLICY "profiles_update_own_or_admin" ON dokdo_guardians.profiles
 -- Archive posts: public posts for everyone, private posts for author/admin
 CREATE POLICY "posts_select_visible" ON dokdo_guardians.archive_posts
   FOR SELECT USING (visibility = 'public' OR author_id = auth.uid() OR dokdo_guardians.is_admin());
+-- Notices (공지사항) are admin-only
 CREATE POLICY "posts_insert_as_self_or_guest" ON dokdo_guardians.archive_posts
-  FOR INSERT WITH CHECK (author_id IS NULL OR author_id = auth.uid());
+  FOR INSERT WITH CHECK (
+    (author_id IS NULL OR author_id = auth.uid())
+    AND (board_type <> 'notice' OR dokdo_guardians.is_admin())
+  );
 CREATE POLICY "posts_update_author_or_admin" ON dokdo_guardians.archive_posts
   FOR UPDATE USING (author_id = auth.uid() OR dokdo_guardians.is_admin())
-  WITH CHECK (author_id = auth.uid() OR dokdo_guardians.is_admin());
+  WITH CHECK ((author_id = auth.uid() AND board_type <> 'notice') OR dokdo_guardians.is_admin());
 CREATE POLICY "posts_delete_author_or_admin" ON dokdo_guardians.archive_posts
   FOR DELETE USING (author_id = auth.uid() OR dokdo_guardians.is_admin());
 

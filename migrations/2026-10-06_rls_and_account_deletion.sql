@@ -1,5 +1,5 @@
 -- =====================================================================
--- Blue Ocean Guardians: RLS hardening, member management, account deletion
+-- Blue Guardians: RLS hardening, member management, account deletion
 -- Date: 2026-10-06
 --
 -- Run ONCE in Supabase Dashboard > SQL Editor on the live database.

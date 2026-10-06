@@ -18,19 +18,6 @@ const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
 const PrivacyPage = lazy(() => import('../pages/Privacy'));
 const ResetPassword = lazy(() => import('../pages/ResetPassword'));
 
-// Fallback component for missing pages
-const PlaceholderPage = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white p-4 text-center">
-    <h1 className="text-3xl font-bold mb-4">페이지 준비 중</h1>
-    <p className="text-gray-400 max-w-md">
-      요청하신 페이지는 현재 준비 중이거나 업데이트가 진행 중입니다. 메인 페이지를 이용해 주세요.
-    </p>
-    <a href="/" className="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition">
-      홈으로 돌아가기
-    </a>
-  </div>
-);
-
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-900">
     <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>

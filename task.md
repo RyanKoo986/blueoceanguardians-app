@@ -119,3 +119,15 @@
 - [x] Run `migrations/2026-10-07_remove_seed_posts.sql` to delete the dummy seed posts/comments from the live DB <!-- id: 120 -->
 - [x] Offer biometric login only with strong biometrics (fingerprint, Face ID, Class 3 face) so weak face-unlock-only Android phones are not offered a flow that cannot work (`biometricService.ts`) <!-- id: 121 -->
 - [ ] Test Face ID on a real iPhone (requires Mac + Xcode iOS build) <!-- id: 122 -->
+- [x] Fix archive board types: allow 'dokdo'/'cleanup' (were silently saved as 'notice'), make notices admin-only in RLS and UI (`migrations/2026-10-07_archive_board_types.sql`, `schema.sql`, `archiveService.ts`, `AIFactCheck.tsx`) <!-- id: 123 -->
+- [x] Run `migrations/2026-10-07_archive_board_types.sql` in the Supabase SQL Editor before deploying the matching code <!-- id: 124 -->
+- [x] Replace LED-company boilerplate meta/OG tags with Blue Ocean Guardians description (`index.html`) <!-- id: 125 -->
+- [x] Fix undefined CSS classes (unused animate-in/fade-in/zoom-in-95, animate-fadeIn typo, mixed-blend-screen typo) <!-- id: 126 -->
+- [x] Remove 24 unused imports/variables and enable `noUnusedLocals`/`noUnusedParameters` in `tsconfig.json` <!-- id: 127 -->
+- [x] Keep the web brand 'Blue Guardians' (footer copyright updated from 'Project Dokdo') and replace the outdated footer privacy modal with a link to `/privacy` <!-- id: 128 -->
+- [x] Assess react-router open-redirect advisory: fix only in v7; not exploitable here (all navigation targets are fixed internal paths), so stay on 6.30.6 <!-- id: 129 -->
+- [x] Rebuild signed release AAB (still contains the OpenAI key until AI calls move to an Edge Function) <!-- id: 130 -->
+- [ ] Move OpenAI calls to a Supabase Edge Function and remove `VITE_OPENAI_API_KEY` from client builds <!-- id: 131 -->
+- [x] Rename the whole brand to 'Blue Guardians' / '블루 가디언즈' (app name, Android/iOS display name, web title, privacy policy, biometric prompt, docs) <!-- id: 132 -->
+- [x] Update home hero subtitle to the blueoceanguardians.org copy ('쿠다(KUDA)와 함께 독도를 지키는 블루가디언즈, ...') with 16px mobile text so the first sentence fits one line (`HeroSection.tsx`) <!-- id: 133 -->
+- [x] Rebuild contest page to match blueoceanguardians.org (hero, breadcrumb, 3 highlight cards, 4-step process); drop unverified dates, prize amounts and award names (`Contest.tsx`) <!-- id: 134 -->

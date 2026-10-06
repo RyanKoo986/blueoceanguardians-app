@@ -33,7 +33,7 @@ export const PrivacyPage: React.FC = () => {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white">개인정보처리방침</h1>
-            <p className="text-sm text-slate-400">Blue Ocean Guardians (블루오션 가디언스)</p>
+            <p className="text-sm text-slate-400">Blue Guardians (블루 가디언즈)</p>
           </div>
         </div>
 
@@ -41,7 +41,7 @@ export const PrivacyPage: React.FC = () => {
         <div className="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 sm:p-8 space-y-8 text-slate-300 leading-relaxed text-sm sm:text-base">
           <div>
             <p className="text-slate-300">
-              <strong>블루오션 가디언스</strong>(이하 "본 서비스")는 정보주체의 자유와 권리 보호를 위해 「개인정보 보호법」 및 관계 법령이 정한 바를 준수하여, 적법하게 개인정보를 처리하고 안전하게 관리하고 있습니다.
+              <strong>블루 가디언즈</strong>(이하 "본 서비스")는 정보주체의 자유와 권리 보호를 위해 「개인정보 보호법」 및 관계 법령이 정한 바를 준수하여, 적법하게 개인정보를 처리하고 안전하게 관리하고 있습니다.
             </p>
           </div>
 
@@ -115,7 +115,7 @@ export const PrivacyPage: React.FC = () => {
               <span className="w-1.5 h-4 bg-blue-500 rounded-full inline-block"></span>
               6. 회원 탈퇴(계정 삭제) 방법
             </h2>
-            <p className="mb-3">Blue Ocean Guardians 계정은 앱 설치 여부와 관계없이 웹사이트에서도 언제든지 직접 삭제할 수 있습니다.</p>
+            <p className="mb-3">Blue Guardians 계정은 앱 설치 여부와 관계없이 웹사이트에서도 언제든지 직접 삭제할 수 있습니다.</p>
             <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40">
               <ol className="list-decimal list-inside space-y-1 text-slate-400 text-sm">
                 <li>앱 또는 웹사이트(<span className="text-blue-400">https://main.d2t329riy5sv3g.amplifyapp.com</span>)에 로그인</li>

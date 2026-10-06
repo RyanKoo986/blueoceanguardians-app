@@ -1,4 +1,4 @@
-# 🌊 Blue Ocean Guardians
+# 🌊 Blue Guardians
 
 > A cross-platform civic participation app for marine ecosystem conservation, real-time ocean hazard reporting, and coastal cleanup coordination centered on the Dokdo Islands and the East Sea.
 
@@ -21,7 +21,7 @@
 
 ## Overview
 
-**Blue Ocean Guardians (블루오션 가디언스)** is a web and mobile application supporting:
+**Blue Guardians (블루 가디언즈)** is a web and mobile application supporting:
 
 - 🦈 **Marine Ecosystem Archive** — Research papers, press releases, and activity reports
 - 🗺️ **Real-time Citizen Reports** — Ocean pollution, marine hazards, and illegal dumping reports with GPS & photo attachments

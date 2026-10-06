@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, ChevronLeft, Home, Trophy, Send } from "lucide-react";
+import { Menu, X, ChevronLeft, Trophy, Send } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 function Header() {
@@ -92,7 +92,7 @@ function Header() {
     return 'Blue Guardians';
   };
 
-  // Project Dokdo menu structure
+  // Site menu structure
   interface MenuItem {
     id?: string;
     label: string;

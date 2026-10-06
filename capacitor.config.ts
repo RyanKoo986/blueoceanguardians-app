@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.blueoceanguardians.app',
-  appName: 'Blue Ocean Guardians',
+  appName: 'Blue Guardians',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

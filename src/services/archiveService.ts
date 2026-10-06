@@ -253,7 +253,7 @@ export const archiveService = {
     return posts;
   },
 
-  async getPost(boardType: string, id: string, _userId?: string, _isAdmin?: boolean): Promise<ArchivePost> {
+  async getPost(_boardType: string, id: string, _userId?: string, _isAdmin?: boolean): Promise<ArchivePost> {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase
         .from('archive_posts')
@@ -311,15 +311,15 @@ export const archiveService = {
 
   async createPost(boardType: string, data: CreatePostData): Promise<ArchivePost> {
     if (isSupabaseConfigured && supabase) {
-      const validBoardType = ['research', 'press', 'notice', 'activity'].includes(boardType)
-        ? boardType
-        : 'notice';
+      if (!['notice', 'dokdo', 'cleanup'].includes(boardType)) {
+        throw new Error('알 수 없는 게시판입니다.');
+      }
 
       // Guests cannot read back their own private posts, so the row is built locally
       const now = new Date().toISOString();
       const post = {
         id: crypto.randomUUID(),
-        board_type: validBoardType,
+        board_type: boardType,
         title: data.title,
         content: data.content,
         author_id: data.authorId.includes('-') ? data.authorId : null,
@@ -484,7 +484,7 @@ export const archiveService = {
     throw new Error('게시글을 찾을 수 없거나 수정에 실패했습니다.');
   },
 
-  async deletePost(boardType: string, id: string, _userId?: string): Promise<void> {
+  async deletePost(_boardType: string, id: string, _userId?: string): Promise<void> {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
     if (isSupabaseConfigured && supabase && isUuid) {
@@ -497,7 +497,7 @@ export const archiveService = {
   },
 
   async searchPosts(
-    boardType: string,
+    _boardType: string,
     query: string,
     _userId?: string,
     _isAdmin?: boolean
@@ -529,7 +529,7 @@ export const archiveService = {
     return posts.filter((p) => p.title.toLowerCase().includes(q) || p.content.toLowerCase().includes(q));
   },
 
-  async addComment(boardType: string, postId: string, comment: { authorId: string; authorName: string; content: string }): Promise<ArchiveComment> {
+  async addComment(_boardType: string, postId: string, comment: { authorId: string; authorName: string; content: string }): Promise<ArchiveComment> {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase
         .from('archive_comments')
@@ -557,8 +557,8 @@ export const archiveService = {
   },
 
   async updateComment(
-    boardType: string,
-    postId: string,
+    _boardType: string,
+    _postId: string,
     commentId: string,
     comment: { authorId: string; content: string }
   ): Promise<ArchiveComment> {
@@ -594,7 +594,7 @@ export const archiveService = {
     };
   },
 
-  async deleteComment(boardType: string, postId: string, commentId: string, _userId?: string): Promise<void> {
+  async deleteComment(_boardType: string, _postId: string, commentId: string, _userId?: string): Promise<void> {
     if (isSupabaseConfigured && supabase) {
       const { error } = await supabase.from('archive_comments').delete().eq('id', commentId);
       if (error) throw new Error(error.message || '댓글 삭제 실패');

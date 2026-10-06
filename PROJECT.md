@@ -1,7 +1,7 @@
-# Project Documentation: Blue Ocean Guardians (블루오션 가디언스)
+# Project Documentation: Blue Guardians (블루 가디언즈)
 
 ## 1. Overview
-블루오션 가디언스(Blue Ocean Guardians)는 독도 및 동해 해양 생태계 보전, 학술 연구 아카이브, 해양 오염/위험 실시간 제보 및 시민 참여형 비치코밍/정화 활동을 지원하는 크로스 플랫폼 웹/앱 프로젝트입니다.
+블루 가디언즈(Blue Guardians)는 독도 및 동해 해양 생태계 보전, 학술 연구 아카이브, 해양 오염/위험 실시간 제보 및 시민 참여형 비치코밍/정화 활동을 지원하는 크로스 플랫폼 웹/앱 프로젝트입니다.
 
 ---
 
@@ -13,12 +13,12 @@
 - **Internationalization**: i18next, react-i18next
 - **Backend & Database**: Supabase (PostgreSQL 15+, Custom Schema `dokdo_guardians`, Row Level Security, Supabase Storage)
 - **Mobile Packaging (Target)**: Capacitor (`@capacitor/core`, `@capacitor/android`, `@capacitor/ios`)
-- **App Display Name**: `Blue Ocean Guardians` (`capacitor.config.ts` appName, `index.html` title)
+- **App Display Name**: `Blue Guardians` (`capacitor.config.ts` appName, `index.html` title)
 - **AI Engine (GPT-4o)**: OpenAI GPT-4o (`aiService.ts`) for real-time historical fact-checking, distortion correction, text refinement, and summarization with offline fallback.
 - **Authentication & App Policy**:
   - **Guest Access**: All articles, research archive, fact checks, citizen error reports, and cleanup applications are accessible without forced login.
   - **Role-based Permissions**: `ADMIN` role for official archive posts, notice publishing, and report moderation.
-  - **App Store & Play Store Compliance (Privacy Policy)**: Dedicated standalone `/privacy` web route and modal in `FooterSection.tsx` compliant with Google Play Console and App Store guidelines.
+  - **App Store & Play Store Compliance (Privacy Policy)**: Single source of truth is the standalone `/privacy` route (`Privacy.tsx`), linked from the footer; it is also the Play Console privacy and account-deletion URL. Do not duplicate policy text elsewhere.
   - **Biometric Quick Login (native app only)**: `@capgo/capacitor-native-biometric`. After a password login (or from the MyPage/Admin toggle after re-entering the password), the email/password is stored with `AccessControl.BIOMETRY_ANY` in Android Keystore / iOS Keychain; `getSecureCredentials()` shows a biometric prompt cryptographically bound to decryption, then a normal Supabase `signInWithPassword` runs. Hidden on the web build (`Capacitor.isNativePlatform()`). Invalid stored logins are auto-removed.
   - **Account Deletion (App Store 5.1.1(v) / Google Play)**: `MyPage.tsx` -> `authService.deleteAccount` -> RPC `delete_my_account()`; admins use the Members tab (`AdminDashboard.tsx`) -> RPC `admin_delete_user()`. Both anonymize the member's posts/comments to '탈퇴한 회원', delete the profile, and delete the `auth.users` login unless another app schema in the shared Supabase project still has a `profiles` row for that user.
   - **App Store Guideline 4.2 Compliance (Native Touch Optimization)**: Global suppression of web callouts (`-webkit-touch-callout: none`), bounce elimination (`overscroll-behavior-y: none`), tap highlight elimination, and selective text copying rules.
@@ -28,7 +28,7 @@
 ## 3. Database Architecture (`schema.sql`)
 Custom schema `dokdo_guardians` is used for total isolation:
 - `dokdo_guardians.profiles`: User metadata, affiliation, license grade, role (`USER`, `ADMIN`, `RESEARCHER`).
-- `dokdo_guardians.archive_posts`: Research papers, press releases, notices, and activity reports.
+- `dokdo_guardians.archive_posts`: Archive posts. `board_type` matches the archive tabs: `notice` (공지사항, admin-only via RLS), `dokdo` (독도 자료), `cleanup` (수중 정화 활동); legacy values `research`/`press`/`activity`/`default` remain allowed.
 - `dokdo_guardians.archive_files`: Attached documents and image files linked to archive posts.
 - `dokdo_guardians.archive_comments`: Comments and discussions on archive posts.
 - `dokdo_guardians.cleanup_requests`: Coastal cleanup / plogging volunteer signups.

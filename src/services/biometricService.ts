@@ -84,7 +84,7 @@ export const biometricService = {
     try {
       const { username, password } = await NativeBiometric.getSecureCredentials({
         server: CREDENTIAL_SERVER,
-        reason: 'Blue Ocean Guardians 간편 로그인',
+        reason: 'Blue Guardians 간편 로그인',
         title: '생체 인증 로그인',
         negativeButtonText: '취소',
       });
