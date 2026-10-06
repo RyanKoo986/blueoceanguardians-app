@@ -23,7 +23,7 @@ export const PrivacyPage: React.FC = () => {
             <ArrowLeft className="w-4 h-4" />
             뒤로가기
           </button>
-          <span className="text-xs text-slate-500">최종 수정일: 2026. 03. 15</span>
+          <span className="text-xs text-slate-500">최종 수정일: 2026. 10. 06</span>
         </div>
 
         {/* Title */}
@@ -110,10 +110,30 @@ export const PrivacyPage: React.FC = () => {
             </p>
           </section>
 
+          <section id="account-deletion">
+            <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <span className="w-1.5 h-4 bg-blue-500 rounded-full inline-block"></span>
+              6. 회원 탈퇴(계정 삭제) 방법
+            </h2>
+            <p className="mb-3">Blue Ocean Guardians 계정은 앱 설치 여부와 관계없이 웹사이트에서도 언제든지 직접 삭제할 수 있습니다.</p>
+            <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40">
+              <ol className="list-decimal list-inside space-y-1 text-slate-400 text-sm">
+                <li>앱 또는 웹사이트(<span className="text-blue-400">https://main.d2t329riy5sv3g.amplifyapp.com</span>)에 로그인</li>
+                <li>마이페이지 &gt; 회원 탈퇴 선택</li>
+                <li>안내에 따라 '탈퇴'를 입력하면 즉시 삭제됩니다.</li>
+              </ol>
+            </div>
+            <ul className="list-disc list-inside space-y-1 pl-2 mt-3 text-slate-400">
+              <li><strong>삭제되는 정보:</strong> 이메일, 비밀번호, 이름, 연락처 등 계정 및 회원 정보 (탈퇴 즉시 삭제)</li>
+              <li><strong>남는 정보:</strong> 작성한 게시물·댓글은 작성자가 '탈퇴한 회원'으로 표시되어 남습니다. 삭제를 원하시면 탈퇴 전에 직접 삭제해 주세요.</li>
+              <li><strong>보관되는 정보:</strong> 관계 법령에 따라 보존 의무가 있는 정보는 해당 기간 동안 보관 후 파기</li>
+            </ul>
+          </section>
+
           <section>
             <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
               <span className="w-1.5 h-4 bg-blue-500 rounded-full inline-block"></span>
-              6. 개인정보 보호책임자 및 문의처
+              7. 개인정보 보호책임자 및 문의처
             </h2>
             <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40 text-sm space-y-1">
               <p><span className="text-slate-500">책임자/운영팀:</span> <span className="text-white">사단법인 대한잠수협회</span></p>

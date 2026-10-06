@@ -1,133 +1,97 @@
-import { authService } from './authService';
-import type { User } from '../types/auth';
+import { Capacitor } from '@capacitor/core';
+import { AccessControl, BiometryType, NativeBiometric } from '@capgo/capacitor-native-biometric';
 
-const BIOMETRIC_ENABLED_KEY = 'dokdo_biometric_enabled';
-const BIOMETRIC_USER_CREDENTIALS_KEY = 'dokdo_biometric_credentials';
+// Keystore/Keychain entry holding the login; only readable after a live biometric check
+const CREDENTIAL_SERVER = 'com.blueoceanguardians.app';
+// Non-secret marker so the UI can show which account is registered on this device
+const REGISTERED_EMAIL_KEY = 'dokdo_biometric_email';
+// Former simulated implementation stored the user object (incl. role) here
+const LEGACY_KEYS = ['dokdo_biometric_enabled', 'dokdo_biometric_credentials'];
+// APP_CANCEL, SYSTEM_CANCEL, USER_CANCEL
+const CANCEL_CODES = ['11', '15', '16'];
+const NO_PROTECTED_CREDENTIALS_FOUND = '21';
+
+export type BiometryKind = 'fingerprint' | 'face' | 'biometrics';
 
 export interface BiometricStatus {
   isAvailable: boolean;
-  biometryType: 'fingerprint' | 'face' | 'biometrics' | 'none';
+  biometryType: BiometryKind;
   isEnabled: boolean;
   registeredEmail: string | null;
 }
 
+const toKind = (type: BiometryType): BiometryKind => {
+  if (type === BiometryType.FACE_ID || type === BiometryType.FACE_AUTHENTICATION) return 'face';
+  if (type === BiometryType.TOUCH_ID || type === BiometryType.FINGERPRINT) return 'fingerprint';
+  return 'biometrics';
+};
+
+export const isBiometricCancel = (err: unknown): boolean =>
+  CANCEL_CODES.includes(String((err as { code?: unknown })?.code));
+
+export const biometricLabel = (kind?: BiometryKind): string =>
+  kind === 'face' ? '얼굴 인증' : kind === 'fingerprint' ? '지문 인증' : '생체 인증';
+
 export const biometricService = {
-  /**
-   * 기기에서 생체 인증 하드웨어 지원 여부 확인
-   */
-  async checkAvailability(): Promise<BiometricStatus> {
-    const isEnabled = localStorage.getItem(BIOMETRIC_ENABLED_KEY) === 'true';
-    const credentials = this.getSavedCredentials();
-    const registeredEmail = credentials ? credentials.email : null;
+  // Native app only: the web build has no secure hardware-backed storage
+  async getStatus(): Promise<BiometricStatus> {
+    LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
+    const registeredEmail = localStorage.getItem(REGISTERED_EMAIL_KEY);
 
-    // WebAuthn 및 모바일 하드웨어 센서 지원 검사
-    const hasWebAuthn = typeof window !== 'undefined' && 
-      Boolean(window.PublicKeyCredential && (await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable?.().catch(() => false)));
+    if (!Capacitor.isNativePlatform()) {
+      return { isAvailable: false, biometryType: 'biometrics', isEnabled: false, registeredEmail: null };
+    }
 
-    // 하이브리드 환경(Capacitor 모바일 또는 최신 모바일 브라우저)
-    const isAvailable = hasWebAuthn || typeof window !== 'undefined';
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const { isAvailable, biometryType } = await NativeBiometric.isAvailable().catch(() => ({
+      isAvailable: false,
+      biometryType: BiometryType.NONE,
+    }));
 
     return {
       isAvailable,
-      biometryType: isIOS ? 'face' : 'fingerprint',
-      isEnabled: isEnabled && Boolean(credentials),
+      biometryType: toKind(biometryType),
+      isEnabled: isAvailable && Boolean(registeredEmail),
       registeredEmail,
     };
   },
 
-  /**
-   * 생체 인증 활성화 상태인지 확인
-   */
-  isBiometricEnabled(): boolean {
-    const isEnabled = localStorage.getItem(BIOMETRIC_ENABLED_KEY) === 'true';
-    const credentials = this.getSavedCredentials();
-    return isEnabled && Boolean(credentials);
+  // Saves the verified login behind biometrics (Android shows the prompt while saving)
+  async enable(email: string, password: string): Promise<void> {
+    await NativeBiometric.setCredentials({
+      username: email,
+      password,
+      server: CREDENTIAL_SERVER,
+      accessControl: AccessControl.BIOMETRY_ANY,
+      title: '생체 인증 등록',
+      negativeButtonText: '취소',
+    });
+    localStorage.setItem(REGISTERED_EMAIL_KEY, email);
   },
 
-  /**
-   * 저장된 생체 인증용 자격증명 조회
-   */
-  getSavedCredentials(): { email: string; token?: string; name: string } | null {
+  async disable(): Promise<void> {
+    localStorage.removeItem(REGISTERED_EMAIL_KEY);
+    if (Capacitor.isNativePlatform()) {
+      await NativeBiometric.deleteCredentials({ server: CREDENTIAL_SERVER }).catch(() => {});
+    }
+  },
+
+  // The biometric prompt is cryptographically bound to decrypting the stored login
+  async unlockCredentials(): Promise<{ email: string; password: string }> {
     try {
-      const data = localStorage.getItem(BIOMETRIC_USER_CREDENTIALS_KEY);
-      return data ? JSON.parse(data) : null;
-    } catch {
-      return null;
-    }
-  },
-
-  /**
-   * 생체 인증 등록 및 활성화
-   */
-  async enableBiometric(user: User): Promise<boolean> {
-    try {
-      const credentials = {
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        id: user.id,
-        token: user.token,
-      };
-
-      localStorage.setItem(BIOMETRIC_USER_CREDENTIALS_KEY, JSON.stringify(credentials));
-      localStorage.setItem(BIOMETRIC_ENABLED_KEY, 'true');
-      return true;
-    } catch (e) {
-      console.error('Failed to enable biometric:', e);
-      return false;
-    }
-  },
-
-  /**
-   * 생체 인증 비활성화 및 등록 해제
-   */
-  disableBiometric(): void {
-    localStorage.removeItem(BIOMETRIC_ENABLED_KEY);
-    localStorage.removeItem(BIOMETRIC_USER_CREDENTIALS_KEY);
-  },
-
-  /**
-   * 생체 인증 실행 및 자동 로그인
-   */
-  async authenticateAndLogin(reason: string = '블루오션 가디언스 간편 로그인'): Promise<User> {
-    const isEnabled = this.isBiometricEnabled();
-    const saved = this.getSavedCredentials();
-
-    if (!isEnabled || !saved) {
-      throw new Error('등록된 생체 인증 정보가 없습니다.\n먼저 이메일로 1회 로그인하여 생체 인증을 등록해주세요.');
-    }
-
-    // WebAuthn 및 네이티브 인증 시뮬레이션 / 실제 센서 호출
-    if (typeof window !== 'undefined' && window.PublicKeyCredential) {
-      try {
-        // 플랫폼 Authenticator가 지원되는 경우 브라우저/OS 보안 프롬프트 호출
-        const challenge = new Uint8Array(32);
-        window.crypto.getRandomValues(challenge);
-        
-        // 간편 인증 세션 확인
-        console.log(`[Biometric Auth] Authenticating with platform sensor: ${reason}`);
-      } catch (err) {
-        console.warn('Native biometric prompt bypassed to secure local auth:', err);
+      const { username, password } = await NativeBiometric.getSecureCredentials({
+        server: CREDENTIAL_SERVER,
+        reason: 'Blue Ocean Guardians 간편 로그인',
+        title: '생체 인증 로그인',
+        negativeButtonText: '취소',
+      });
+      return { email: username, password };
+    } catch (err) {
+      // Entry was removed (e.g. all biometrics deleted on the device)
+      if (String((err as { code?: unknown })?.code) === NO_PROTECTED_CREDENTIALS_FOUND) {
+        await this.disable();
+        throw new Error('기기에 저장된 생체 인증 정보가 없습니다.\n비밀번호로 로그인한 뒤 다시 등록해 주세요.');
       }
+      throw err;
     }
-
-    // 현재 사용자 세션 복원
-    const currentUser = authService.getCurrentUser();
-    if (currentUser && currentUser.email === saved.email) {
-      return currentUser;
-    }
-
-    // 저장된 크레덴셜 기반으로 자동 복원
-    const user: User = {
-      id: saved.id || 'bio-user',
-      email: saved.email,
-      name: saved.name || '가디언즈 회원',
-      role: (saved as any).role || 'USER',
-      token: saved.token,
-    };
-
-    localStorage.setItem('dokdo_current_user', JSON.stringify(user));
-    return user;
   },
 };

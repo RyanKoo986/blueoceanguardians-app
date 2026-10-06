@@ -9,6 +9,7 @@ export interface User {
   phone?: string;
   affiliation?: string;
   licenseGrade?: string;
+  createdAt?: string;
 }
 
 export interface LoginCredentials {

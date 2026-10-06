@@ -66,11 +66,7 @@ export const authService = {
     if (!cleanEmail) return false;
 
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', cleanEmail)
-        .maybeSingle();
+      const { data, error } = await supabase.rpc('email_exists', { p_email: cleanEmail });
 
       if (error) {
         console.warn('Error checking email duplicate:', error);
@@ -108,18 +104,23 @@ export const authService = {
       }
 
       if (data.user) {
-        // 프로필 테이블 저장
-        await supabase.from('profiles').upsert({
-          id: data.user.id,
-          email: email,
-          name: credentials.name || credentials.id || '새 가디언',
-          role: 'USER',
-          birth_date: credentials.birthDate,
-          address: credentials.address,
-          phone: credentials.phone,
-          affiliation: credentials.affiliation,
-          license_grade: credentials.licenseGrade,
+        // 프로필 저장 (역할은 서버에서 USER로 고정)
+        const { error: profileError } = await supabase.rpc('create_my_profile', {
+          profile: {
+            id: data.user.id,
+            email: email,
+            name: credentials.name || credentials.id || '새 가디언',
+            birth_date: credentials.birthDate,
+            address: credentials.address,
+            phone: credentials.phone,
+            affiliation: credentials.affiliation,
+            license_grade: credentials.licenseGrade,
+          },
         });
+
+        if (profileError) {
+          throw new Error(profileError.message || '회원 정보 저장에 실패했습니다.');
+        }
 
         const user: User = {
           id: data.user.id,
@@ -218,6 +219,7 @@ export const authService = {
         affiliation: p.affiliation,
         address: p.address,
         licenseGrade: p.license_grade,
+        createdAt: p.created_at,
       }));
     }
 
@@ -225,20 +227,33 @@ export const authService = {
     return current ? [current] : [];
   },
 
-  // [관리자] 회원 삭제
-  async deleteUser(userId: string): Promise<void> {
+  // [관리자] 회원 권한 변경
+  async updateUserRole(userId: string, role: string): Promise<void> {
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      const { error } = await supabase.from('profiles').update({ role }).eq('id', userId);
       if (error) {
-        throw new Error(error.message || '회원 삭제에 실패했습니다.');
+        throw new Error(error.message || '권한 변경에 실패했습니다.');
       }
     }
   },
 
-  // [회원 본인 탈퇴 / 계정 삭제] (App Store 가이드라인 5.1.1 준수)
-  async deleteAccount(userId: string): Promise<void> {
+  // [관리자] 회원 강제 탈퇴 (게시물·댓글 익명화 후 프로필과 로그인 계정 삭제)
+  async deleteUser(userId: string): Promise<void> {
     if (isSupabaseConfigured && supabase) {
-      await supabase.from('profiles').delete().eq('id', userId);
+      const { error } = await supabase.rpc('admin_delete_user', { target: userId });
+      if (error) {
+        throw new Error(error.message || '회원 탈퇴 처리에 실패했습니다.');
+      }
+    }
+  },
+
+  // [회원 본인 탈퇴 / 계정 삭제] (App Store 가이드라인 5.1.1, Google Play 계정 삭제 정책 준수)
+  async deleteAccount(): Promise<void> {
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.rpc('delete_my_account');
+      if (error) {
+        throw new Error(error.message || '탈퇴 처리에 실패했습니다.');
+      }
       await supabase.auth.signOut().catch(() => {});
     }
     localStorage.removeItem(CURRENT_USER_KEY);

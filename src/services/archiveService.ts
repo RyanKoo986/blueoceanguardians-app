@@ -269,12 +269,8 @@ export const archiveService = {
         throw new Error(error?.message || '게시글을 찾을 수 없습니다.');
       }
 
-      // 조회수 증가
-      supabase
-        .from('archive_posts')
-        .update({ views: (data.views || 0) + 1 })
-        .eq('id', id)
-        .then();
+      // 조회수 증가 (방문자는 게시글 UPDATE 권한이 없으므로 RPC 사용)
+      supabase.rpc('increment_post_views', { post_id: id }).then();
 
       return {
         id: data.id,
@@ -319,22 +315,22 @@ export const archiveService = {
         ? boardType
         : 'notice';
 
-      const { data: post, error } = await supabase
-        .from('archive_posts')
-        .insert({
-          board_type: validBoardType,
-          title: data.title,
-          content: data.content,
-          author_id: data.authorId.includes('-') ? data.authorId : null,
-          author_name: data.authorName,
-          visibility: data.visibility || 'public',
-          category: data.category || '일반',
-        })
-        .select()
-        .single();
+      // Guests cannot read back their own private posts, so the row is built locally
+      const now = new Date().toISOString();
+      const post = {
+        id: crypto.randomUUID(),
+        board_type: validBoardType,
+        title: data.title,
+        content: data.content,
+        author_id: data.authorId.includes('-') ? data.authorId : null,
+        author_name: data.authorName,
+        visibility: data.visibility || 'public',
+        category: data.category || '일반',
+      };
+      const { error } = await supabase.from('archive_posts').insert(post);
 
-      if (error || !post) {
-        throw new Error(error?.message || '게시글 작성에 실패했습니다.');
+      if (error) {
+        throw new Error(error.message || '게시글 작성에 실패했습니다.');
       }
 
       // 파일 업로드 처리
@@ -376,9 +372,9 @@ export const archiveService = {
         visibility: post.visibility,
         views: 0,
         category: post.category,
-        isImportant: post.is_important,
-        createdAt: post.created_at,
-        updatedAt: post.updated_at,
+        isImportant: false,
+        createdAt: now,
+        updatedAt: now,
         files: uploadedFiles,
         comments: [],
       };

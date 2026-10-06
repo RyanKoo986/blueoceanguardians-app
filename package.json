@@ -17,6 +17,7 @@
     "@capacitor/core": "^8.5.1",
     "@capacitor/ios": "^8.5.1",
     "@capacitor/keyboard": "^8.0.5",
+    "@capgo/capacitor-native-biometric": "^8.7.0",
     "@supabase/supabase-js": "^2.116.0",
     "framer-motion": "^11.0.0",
     "i18next": "^23.10.0",

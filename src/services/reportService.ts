@@ -23,24 +23,23 @@ export interface ReportItem {
 const LOCAL_STORAGE_KEY = 'dokdo_reports';
 
 export const reportService = {
-  async createReport(data: CreateReportData): Promise<any> {
+  async createReport(data: CreateReportData): Promise<void> {
     if (isSupabaseConfigured && supabase) {
-      const { data: record, error } = await supabase
-        .from('reports')
-        .insert({
-          url: data.url,
-          description: data.description,
-        })
-        .select()
-        .single();
+      // Submitters cannot read reports back (admin-only RLS), so the id is generated here
+      const reportId = crypto.randomUUID();
+      const { error } = await supabase.from('reports').insert({
+        id: reportId,
+        url: data.url,
+        description: data.description,
+      });
 
-      if (error || !record) {
-        throw new Error(error?.message || '제보 제출에 실패했습니다.');
+      if (error) {
+        throw new Error(error.message || '제보 제출에 실패했습니다.');
       }
 
       if (data.files && data.files.length > 0) {
         for (const file of data.files) {
-          const filePath = `reports/${record.id}/${Date.now()}_${file.name}`;
+          const filePath = `reports/${reportId}/${Date.now()}_${file.name}`;
           const { error: uploadErr } = await supabase.storage
             .from(STORAGE_BUCKET)
             .upload(filePath, file);
@@ -51,7 +50,7 @@ export const reportService = {
               .getPublicUrl(filePath);
 
             await supabase.from('report_files').insert({
-              report_id: record.id,
+              report_id: reportId,
               name: file.name,
               filename: filePath,
               size: file.size,
@@ -60,8 +59,7 @@ export const reportService = {
           }
         }
       }
-
-      return record;
+      return;
     }
 
     const items = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '[]');
@@ -74,7 +72,6 @@ export const reportService = {
     };
     items.unshift(newItem);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
-    return newItem;
   },
 
   async getReports(): Promise<ReportItem[]> {

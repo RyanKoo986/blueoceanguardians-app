@@ -21,28 +21,26 @@ export const contactService = {
   // 문의 폼 제출
   async submitContact(data: CreateContactData): Promise<ContactForm> {
     if (isSupabaseConfigured && supabase) {
-      const { data: record, error } = await supabase
-        .from('contacts')
-        .insert({
-          name: data.name,
-          email: data.email,
-          message: data.message,
-        })
-        .select()
-        .single();
-
-      if (error || !record) {
-        throw new Error(error?.message || '문의 제출에 실패했습니다.');
-      }
-
-      return {
+      // Senders cannot read inquiries back (admin-only RLS), so the row is built locally
+      const record: ContactForm = {
+        id: crypto.randomUUID(),
+        name: data.name,
+        email: data.email,
+        message: data.message,
+        createdAt: new Date().toISOString(),
+        read: false,
+      };
+      const { error } = await supabase.from('contacts').insert({
         id: record.id,
         name: record.name,
         email: record.email,
         message: record.message,
-        createdAt: record.created_at,
-        read: record.is_read,
-      };
+      });
+
+      if (error) {
+        throw new Error(error.message || '문의 제출에 실패했습니다.');
+      }
+      return record;
     }
 
     const items = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '[]');
