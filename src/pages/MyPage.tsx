@@ -3,7 +3,9 @@ import { Helmet } from 'react-helmet-async';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Shield, Award, Phone, MapPin, LogOut, Trash2, AlertTriangle, MessageSquare, Waves, ChevronRight, Fingerprint, Scan } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { biometricService } from '../services/biometricService';
+import { biometricLabel } from '../services/biometricService';
+import { useBiometricSetting } from '../hooks/useBiometricSetting';
+import BiometricPasswordModal from '../components/common/BiometricPasswordModal';
 
 export default function MyPage() {
   const { user, isAuthenticated, logout, deleteAccount } = useAuth();
@@ -11,34 +13,15 @@ export default function MyPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const [bioEnabled, setBioEnabled] = useState(false);
-  const [bioType, setBioType] = useState<'fingerprint' | 'face' | 'biometrics'>('fingerprint');
+  const biometric = useBiometricSetting(user?.email);
+  const bioEnabled = biometric.isEnabled;
+  const bioType = biometric.status?.biometryType;
 
   React.useEffect(() => {
     if (isAuthenticated && user?.role === 'ADMIN') {
       navigate('/admin', { replace: true });
     }
   }, [isAuthenticated, user, navigate]);
-
-  React.useEffect(() => {
-    biometricService.checkAvailability().then((status) => {
-      setBioEnabled(status.isEnabled);
-      setBioType(status.biometryType as any);
-    });
-  }, []);
-
-  const handleToggleBiometric = async () => {
-    if (!user) return;
-    if (bioEnabled) {
-      biometricService.disableBiometric();
-      setBioEnabled(false);
-    } else {
-      const success = await biometricService.enableBiometric(user);
-      if (success) {
-        setBioEnabled(true);
-      }
-    }
-  };
 
   if (!isAuthenticated || !user) {
     return (
@@ -80,7 +63,7 @@ export default function MyPage() {
     try {
       setIsDeleting(true);
       await deleteAccount();
-      alert('회원 탈퇴 및 계정 데이터 삭제가 완료되었습니다.');
+      alert('회원 탈퇴가 완료되었습니다.');
       navigate('/');
     } catch (err: any) {
       alert(err.message || '탈퇴 처리에 실패했습니다. 다시 시도해주세요.');
@@ -177,78 +160,87 @@ export default function MyPage() {
           </div>
         )}
 
-        {/* Security & Biometric Login Settings */}
-        <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-5 sm:p-7 backdrop-blur-md">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-start gap-3.5">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
-                style={{ backgroundColor: 'rgba(6, 182, 212, 0.15)', color: '#22d3ee' }}
-              >
-                {bioType === 'face' ? (
-                  <Scan className="w-5 h-5" />
-                ) : (
-                  <Fingerprint className="w-5 h-5" />
-                )}
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2 flex-wrap">
-                  생체 인증 간편 로그인
-                  {bioEnabled ? (
-                    <span
-                      className="text-[10px] px-2 py-0.5 rounded-full font-semibold border"
-                      style={{
-                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                        color: '#34d399',
-                        borderColor: 'rgba(16, 185, 129, 0.3)',
-                      }}
-                    >
-                      사용 중
-                    </span>
+        {/* Security & Biometric Login Settings (native app only) */}
+        {biometric.status?.isAvailable && (
+          <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-5 sm:p-7 backdrop-blur-md">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-start gap-3.5">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                  style={{ backgroundColor: 'rgba(6, 182, 212, 0.15)', color: '#22d3ee' }}
+                >
+                  {bioType === 'face' ? (
+                    <Scan className="w-5 h-5" />
                   ) : (
-                    <span
-                      className="text-[10px] px-2 py-0.5 rounded-full font-semibold border"
-                      style={{
-                        backgroundColor: 'rgba(156, 163, 175, 0.2)',
-                        color: '#9ca3af',
-                        borderColor: 'rgba(156, 163, 175, 0.3)',
-                      }}
-                    >
-                      비활성
-                    </span>
+                    <Fingerprint className="w-5 h-5" />
                   )}
-                </h3>
-                <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                  스마트폰의 {bioType === 'face' ? 'Face ID' : '지문 센서'}를 사용하여 비밀번호 없이 즉시 로그인합니다.
-                </p>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white flex items-center gap-2 flex-wrap">
+                    생체 인증 간편 로그인
+                    {bioEnabled ? (
+                      <span
+                        className="text-[10px] px-2 py-0.5 rounded-full font-semibold border"
+                        style={{
+                          backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                          color: '#34d399',
+                          borderColor: 'rgba(16, 185, 129, 0.3)',
+                        }}
+                      >
+                        사용 중
+                      </span>
+                    ) : (
+                      <span
+                        className="text-[10px] px-2 py-0.5 rounded-full font-semibold border"
+                        style={{
+                          backgroundColor: 'rgba(156, 163, 175, 0.2)',
+                          color: '#9ca3af',
+                          borderColor: 'rgba(156, 163, 175, 0.3)',
+                        }}
+                      >
+                        비활성
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                    스마트폰의 {biometricLabel(bioType)}으로 비밀번호 없이 로그인합니다.
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <button
-              type="button"
-              role="switch"
-              aria-checked={bioEnabled}
-              onClick={handleToggleBiometric}
-              style={{
-                width: '52px',
-                height: '30px',
-                backgroundColor: bioEnabled ? '#06b6d4' : '#4b5563',
-                transition: 'background-color 0.25s ease',
-              }}
-              className="relative shrink-0 cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900"
-            >
-              <span
+              <button
+                type="button"
+                role="switch"
+                aria-checked={bioEnabled}
+                onClick={biometric.toggle}
                 style={{
-                  width: '24px',
-                  height: '24px',
-                  transform: bioEnabled ? 'translateX(22px)' : 'translateX(1px)',
-                  transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  width: '52px',
+                  height: '30px',
+                  backgroundColor: bioEnabled ? '#06b6d4' : '#4b5563',
+                  transition: 'background-color 0.25s ease',
                 }}
-                className="pointer-events-none block rounded-full bg-white shadow-md"
-              />
-            </button>
+                className="relative shrink-0 cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900"
+              >
+                <span
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    transform: bioEnabled ? 'translateX(22px)' : 'translateX(1px)',
+                    transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  }}
+                  className="pointer-events-none block rounded-full bg-white shadow-md"
+                />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+        {biometric.isPasswordPromptOpen && (
+          <BiometricPasswordModal
+            biometryLabel={biometricLabel(bioType)}
+            onSubmit={biometric.enableWithPassword}
+            onClose={biometric.closePasswordPrompt}
+          />
+        )}
 
         {/* Account Actions */}
         <div className="bg-slate-800/40 border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -298,7 +290,8 @@ export default function MyPage() {
             </div>
 
             <div className="bg-red-950/20 border border-red-500/20 rounded-xl p-4 text-xs text-gray-300 space-y-2 leading-relaxed">
-              <p>• 탈퇴 시 프로필 및 등록된 활동 내역이 즉시 영구 삭제되며 복구할 수 없습니다.</p>
+              <p>• 탈퇴 시 계정과 회원 정보가 즉시 영구 삭제되며 복구할 수 없습니다.</p>
+              <p>• 작성한 게시물·댓글은 '탈퇴한 회원'으로 표시되어 남습니다. 삭제를 원하시면 탈퇴 전에 직접 삭제해 주세요.</p>
               <p>• 진행을 원하시면 아래에 <strong>'탈퇴'</strong>를 입력해 주세요.</p>
             </div>
 

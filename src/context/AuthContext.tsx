@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { User, LoginCredentials, SignupCredentials, UpdateUserData } from '../types/auth';
 import { authService } from '../services/authService';
 
@@ -16,14 +16,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-    }
-  }, []);
+  // Restore synchronously so guarded pages (e.g. /admin) see the user on their first render
+  const [user, setUser] = useState<User | null>(() => authService.getCurrentUser());
 
   const login = async (credentials: LoginCredentials) => {
     const loggedInUser = await authService.login(credentials);
@@ -50,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteAccount = async () => {
     if (!user) return;
-    await authService.deleteAccount(user.id);
+    await authService.deleteAccount();
     setUser(null);
   };
 

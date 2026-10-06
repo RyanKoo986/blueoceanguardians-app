@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Helmet } from 'react-helmet-async';
 import { Fingerprint, Scan, ShieldCheck, CheckCircle, X, KeyRound, Mail, ArrowRight } from 'lucide-react';
-import { biometricService, type BiometricStatus } from '../services/biometricService';
+import { biometricLabel, biometricService, isBiometricCancel, type BiometricStatus } from '../services/biometricService';
 import { authService } from '../services/authService';
 
 const Login = () => {
@@ -16,8 +16,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const [bioStatus, setBioStatus] = useState<BiometricStatus | null>(null);
-  const [showRegisterPrompt, setShowRegisterPrompt] = useState(false);
-  const [pendingLoggedInUser, setPendingLoggedInUser] = useState<any>(null);
+  // Login just verified with a password, kept in memory only until the user answers the prompt
+  const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string } | null>(null);
 
   // 비밀번호 재설정 모달 관련 상태
   const [showForgotModal, setShowForgotModal] = useState(false);
@@ -30,10 +30,8 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 생체 인증 지원 여부 및 등록 상태 조회
-    biometricService.checkAvailability().then((status) => {
-      setBioStatus(status);
-    });
+    // 생체 인증 지원 여부 및 등록 상태 조회 (네이티브 앱에서만 사용 가능)
+    biometricService.getStatus().then(setBioStatus);
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,12 +49,12 @@ const Login = () => {
 
     try {
       await login(formData);
-      
-      // 생체 인증 미등록 상태일 때 등록 권유 팝업 표시
-      const currentStatus = await biometricService.checkAvailability();
-      if (currentStatus.isAvailable && !currentStatus.isEnabled) {
-        setPendingLoggedInUser(formData);
-        setShowRegisterPrompt(true);
+
+      // 이 계정으로 생체 인증이 등록되지 않은 경우 등록 권유 팝업 표시
+      const loggedInEmail = authService.getCurrentUser()?.email;
+      const currentStatus = await biometricService.getStatus();
+      if (loggedInEmail && currentStatus.isAvailable && currentStatus.registeredEmail !== loggedInEmail) {
+        setPendingCredentials({ email: loggedInEmail, password: formData.password });
       } else {
         navigate('/');
       }
@@ -73,27 +71,42 @@ const Login = () => {
     setBiometricLoading(true);
 
     try {
-      if (!bioStatus?.isEnabled) {
-        throw new Error('등록된 생체 인증 정보가 없습니다.\n아이디와 비밀번호로 1회 로그인하여 생체 인증을 활성화해주세요.');
+      const credentials = await biometricService.unlockCredentials();
+      try {
+        await login(credentials);
+      } catch {
+        // Password changed or account removed since registration
+        await biometricService.disable();
+        setBioStatus(await biometricService.getStatus());
+        throw new Error('저장된 로그인 정보가 더 이상 유효하지 않아 생체 인증을 해제했습니다.\n비밀번호로 로그인한 뒤 다시 등록해 주세요.');
       }
-
-      await biometricService.authenticateAndLogin();
       navigate('/');
     } catch (err: any) {
-      setError(err.message || '생체 인증에 실패했습니다.');
+      if (!isBiometricCancel(err)) {
+        setError(err.message || '생체 인증에 실패했습니다.');
+      }
     } finally {
       setBiometricLoading(false);
     }
   };
 
-  // 생체 인증 등록 승인
-  const handleConfirmBiometricRegister = async () => {
-    if (pendingLoggedInUser) {
-      const currentUser = JSON.parse(localStorage.getItem('dokdo_current_user') || '{}');
-      await biometricService.enableBiometric(currentUser);
-    }
-    setShowRegisterPrompt(false);
+  const closeRegisterPrompt = () => {
+    setPendingCredentials(null);
     navigate('/');
+  };
+
+  // 생체 인증 등록 승인: 방금 확인된 로그인 정보를 기기 보안 저장소에 저장
+  const handleConfirmBiometricRegister = async () => {
+    if (pendingCredentials) {
+      try {
+        await biometricService.enable(pendingCredentials.email, pendingCredentials.password);
+      } catch (err) {
+        if (!isBiometricCancel(err)) {
+          alert('생체 인증 등록에 실패했습니다. 마이페이지에서 다시 시도해 주세요.');
+        }
+      }
+    }
+    closeRegisterPrompt();
   };
 
   // 비밀번호 재설정 이메일 발송
@@ -225,42 +238,38 @@ const Login = () => {
               {loading ? '로그인 중...' : '로그인'}
             </button>
 
-            {/* 🔐 생체 인증 간편 로그인 버튼 */}
-            <div className="pt-3 border-t border-gray-100">
-              <button
-                type="button"
-                onClick={handleBiometricLogin}
-                disabled={loading || biometricLoading}
-                className={`w-full py-2.5 px-4 rounded-xl border flex items-center justify-center gap-2.5 font-bold text-xs sm:text-sm transition-all duration-200 shadow-sm active:scale-[0.98] ${
-                  bioStatus?.isEnabled
-                    ? 'bg-slate-900 hover:bg-slate-800 text-white border-slate-900'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                }`}
-              >
-                {bioStatus?.biometryType === 'face' ? (
-                  <Scan className="w-4 h-4 text-cyan-500" />
-                ) : (
-                  <Fingerprint className="w-4 h-4 text-cyan-500" />
-                )}
-                <span>
-                  {biometricLoading
-                    ? '생체 인증 확인 중...'
-                    : '지문 / Face ID 간편 로그인'}
-                </span>
-              </button>
-              {bioStatus?.isEnabled && bioStatus.registeredEmail && (
+            {/* 🔐 생체 인증 간편 로그인 버튼 (이 기기에 등록된 경우에만) */}
+            {bioStatus?.isEnabled && (
+              <div className="pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={handleBiometricLogin}
+                  disabled={loading || biometricLoading}
+                  className="w-full py-2.5 px-4 rounded-xl border flex items-center justify-center gap-2.5 font-bold text-xs sm:text-sm transition-all duration-200 shadow-sm active:scale-[0.98] bg-slate-900 hover:bg-slate-800 text-white border-slate-900"
+                >
+                  {bioStatus.biometryType === 'face' ? (
+                    <Scan className="w-4 h-4 text-cyan-500" />
+                  ) : (
+                    <Fingerprint className="w-4 h-4 text-cyan-500" />
+                  )}
+                  <span>
+                    {biometricLoading
+                      ? '생체 인증 확인 중...'
+                      : `${biometricLabel(bioStatus.biometryType)}으로 로그인`}
+                  </span>
+                </button>
                 <p className="text-[11px] text-center text-gray-400 mt-1.5 flex items-center justify-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-emerald-500 inline" />
                   기기에 등록된 계정: <span className="font-semibold text-gray-600">{bioStatus.registeredEmail}</span>
                 </p>
-              )}
-            </div>
+              </div>
+            )}
           </form>
         </div>
       </div>
 
       {/* 팝업 모달 1: 최초 로그인 성공 시 생체 인증 등록 권유 */}
-      {showRegisterPrompt && (
+      {pendingCredentials && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between">
@@ -268,10 +277,7 @@ const Login = () => {
                 <Fingerprint className="w-6 h-6" />
               </div>
               <button
-                onClick={() => {
-                  setShowRegisterPrompt(false);
-                  navigate('/');
-                }}
+                onClick={closeRegisterPrompt}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
@@ -280,20 +286,17 @@ const Login = () => {
 
             <div className="space-y-1.5">
               <h3 className="text-base font-bold text-gray-900">
-                생체 인증(지문 / Face ID) 등록
+                {biometricLabel(bioStatus?.biometryType)} 간편 로그인 등록
               </h3>
               <p className="text-xs text-gray-600 leading-relaxed">
-                다음 로그인부터 비밀번호 입력 없이 스마트폰 지문이나 Face ID로 1초 만에 간편하게 로그인하시겠습니까?
+                다음 로그인부터 비밀번호 입력 없이 {biometricLabel(bioStatus?.biometryType)}으로 로그인하시겠습니까? 로그인 정보는 이 기기의 보안 저장소에만 암호화되어 저장됩니다.
               </p>
             </div>
 
             <div className="flex gap-2.5 pt-2">
               <button
                 type="button"
-                onClick={() => {
-                  setShowRegisterPrompt(false);
-                  navigate('/');
-                }}
+                onClick={closeRegisterPrompt}
                 className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition"
               >
                 나중에 하기

@@ -11,50 +11,50 @@ import {
   Fingerprint,
   Scan,
   Mail,
-  LogOut
+  LogOut,
+  UserCog,
+  Search
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { reportService, type ReportItem } from '../../services/reportService';
 import { cleanupService, type CleanupItem } from '../../services/cleanupService';
 import { contactService, type ContactForm } from '../../services/contactService';
-import { biometricService } from '../../services/biometricService';
+import { authService } from '../../services/authService';
+import { biometricLabel } from '../../services/biometricService';
+import { useBiometricSetting } from '../../hooks/useBiometricSetting';
+import BiometricPasswordModal from '../../components/common/BiometricPasswordModal';
+import type { User } from '../../types/auth';
+
+const ROLE_LABELS: Record<string, string> = {
+  USER: '일반 회원',
+  RESEARCHER: '연구원',
+  ADMIN: '관리자',
+};
+
+const ROLE_BADGE_STYLES: Record<string, string> = {
+  USER: 'bg-slate-100 text-slate-600 border-slate-200',
+  RESEARCHER: 'bg-amber-50 text-amber-700 border-amber-200',
+  ADMIN: 'bg-red-50 text-red-700 border-red-200',
+};
 
 export default function AdminDashboard() {
   const { user, isAdmin, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const initialTab = (location.state as any)?.tab;
-  const [activeTab, setActiveTab] = useState<'reports' | 'cleanup' | 'contacts'>(
-    initialTab && ['reports', 'cleanup', 'contacts'].includes(initialTab) ? initialTab : 'reports'
+  const [activeTab, setActiveTab] = useState<'reports' | 'cleanup' | 'contacts' | 'members'>(
+    initialTab && ['reports', 'cleanup', 'contacts', 'members'].includes(initialTab) ? initialTab : 'reports'
   );
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [cleanups, setCleanups] = useState<CleanupItem[]>([]);
   const [contacts, setContacts] = useState<ContactForm[]>([]);
+  const [members, setMembers] = useState<User[]>([]);
+  const [memberQuery, setMemberQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Biometric authentication state
-  const [bioEnabled, setBioEnabled] = useState(false);
-  const [bioType, setBioType] = useState<'fingerprint' | 'face' | 'biometrics'>('fingerprint');
-
-  useEffect(() => {
-    biometricService.checkAvailability().then((status) => {
-      setBioEnabled(status.isEnabled);
-      setBioType(status.biometryType as any);
-    });
-  }, []);
-
-  const handleToggleBiometric = async () => {
-    if (!user) return;
-    if (bioEnabled) {
-      biometricService.disableBiometric();
-      setBioEnabled(false);
-    } else {
-      const success = await biometricService.enableBiometric(user);
-      if (success) {
-        setBioEnabled(true);
-      }
-    }
-  };
+  const biometric = useBiometricSetting(user?.email);
+  const bioEnabled = biometric.isEnabled;
+  const bioType = biometric.status?.biometryType;
 
   useEffect(() => {
     if ((location.state as any)?.tab) {
@@ -74,14 +74,16 @@ export default function AdminDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [rData, cData, ctData] = await Promise.all([
+      const [rData, cData, ctData, mData] = await Promise.all([
         reportService.getReports(),
         cleanupService.getCleanups(),
         contactService.getContacts(),
+        authService.getAllUsers(),
       ]);
       setReports(rData);
       setCleanups(cData);
       setContacts(ctData);
+      setMembers(mData);
     } catch (err) {
       console.error('관리자 데이터 로드 실패:', err);
     } finally {
@@ -151,6 +153,31 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleChangeRole = async (member: User, role: string) => {
+    if (!confirm(`${member.name || member.email} 님의 권한을 '${ROLE_LABELS[role]}'(으)로 변경하시겠습니까?`)) return;
+    try {
+      await authService.updateUserRole(member.id, role);
+      setMembers(prev => prev.map(m => m.id === member.id ? { ...m, role } : m));
+    } catch (err: any) {
+      alert(err.message || '권한 변경에 실패했습니다.');
+    }
+  };
+
+  const handleDeleteMember = async (member: User) => {
+    if (!confirm(`${member.name || member.email} 님을 탈퇴 처리하시겠습니까?\n계정은 즉시 삭제되며, 작성한 게시물·댓글은 '탈퇴한 회원'으로 남습니다.`)) return;
+    try {
+      await authService.deleteUser(member.id);
+      setMembers(prev => prev.filter(m => m.id !== member.id));
+    } catch (err: any) {
+      alert(err.message || '탈퇴 처리에 실패했습니다.');
+    }
+  };
+
+  const normalizedMemberQuery = memberQuery.trim().toLowerCase();
+  const filteredMembers = members.filter((m) =>
+    `${m.name ?? ''} ${m.email ?? ''}`.toLowerCase().includes(normalizedMemberQuery)
+  );
+
   return (
     <div 
       className="min-h-screen bg-slate-50 text-slate-900 px-4 sm:px-6 lg:px-8"
@@ -207,66 +234,75 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Security & Biometric Login Card */}
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-sm flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 min-w-0">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 shrink-0 shadow-inner">
-              {bioType === 'face' ? (
-                <Scan className="w-6 h-6" />
-              ) : (
-                <Fingerprint className="w-6 h-6" />
-              )}
-            </div>
-            <div className="min-w-0 space-y-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-base font-bold text-slate-900">
-                  생체 인증 간편 로그인
-                </h2>
-                <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold border ${
-                  bioEnabled
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-slate-100 text-slate-500 border-slate-200'
-                }`}>
-                  {bioEnabled ? '사용 중' : '비활성'}
-                </span>
+        {/* Security & Biometric Login Card (native app only) */}
+        {biometric.status?.isAvailable && (
+          <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-sm flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 shrink-0 shadow-inner">
+                {bioType === 'face' ? (
+                  <Scan className="w-6 h-6" />
+                ) : (
+                  <Fingerprint className="w-6 h-6" />
+                )}
               </div>
-              <p className="text-xs sm:text-sm text-slate-500 leading-normal">
-                스마트폰의 {bioType === 'face' ? 'Face ID' : '지문 센서'}로 비밀번호 없이 즉시 로그인합니다.
-              </p>
+              <div className="min-w-0 space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-base font-bold text-slate-900">
+                    생체 인증 간편 로그인
+                  </h2>
+                  <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold border ${
+                    bioEnabled
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-slate-100 text-slate-500 border-slate-200'
+                  }`}>
+                    {bioEnabled ? '사용 중' : '비활성'}
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-500 leading-normal">
+                  스마트폰의 {biometricLabel(bioType)}으로 비밀번호 없이 로그인합니다.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <button
-            type="button"
-            role="switch"
-            aria-checked={bioEnabled}
-            onClick={handleToggleBiometric}
-            style={{
-              width: '54px',
-              height: '32px',
-              backgroundColor: bioEnabled ? '#0284c7' : '#cbd5e1',
-              transition: 'background-color 0.25s ease',
-            }}
-            className="relative shrink-0 cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 shadow-inner"
-            aria-label="생체 인증 토글"
-          >
-            <span
+            <button
+              type="button"
+              role="switch"
+              aria-checked={bioEnabled}
+              onClick={biometric.toggle}
               style={{
-                width: '26px',
-                height: '26px',
-                transform: bioEnabled ? 'translateX(22px)' : 'translateX(1px)',
-                transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                width: '54px',
+                height: '32px',
+                backgroundColor: bioEnabled ? '#0284c7' : '#cbd5e1',
+                transition: 'background-color 0.25s ease',
               }}
-              className="pointer-events-none block rounded-full bg-white shadow-md"
-            />
-          </button>
-        </div>
+              className="relative shrink-0 cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 shadow-inner"
+              aria-label="생체 인증 토글"
+            >
+              <span
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  transform: bioEnabled ? 'translateX(22px)' : 'translateX(1px)',
+                  transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+                className="pointer-events-none block rounded-full bg-white shadow-md"
+              />
+            </button>
+          </div>
+        )}
+        {biometric.isPasswordPromptOpen && (
+          <BiometricPasswordModal
+            biometryLabel={biometricLabel(bioType)}
+            onSubmit={biometric.enableWithPassword}
+            onClose={biometric.closePasswordPrompt}
+          />
+        )}
 
         {/* Tab Navigation - Modern Segmented Control */}
-        <div className="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1.5 shadow-inner">
+        <div className="bg-slate-200/80 p-1.5 rounded-2xl grid grid-cols-2 sm:grid-cols-4 gap-1.5 shadow-inner">
           <button
             onClick={() => setActiveTab('reports')}
-            className={`flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
+            className={`min-w-0 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
               activeTab === 'reports'
                 ? 'bg-white text-red-600 shadow-md border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
@@ -283,7 +319,7 @@ export default function AdminDashboard() {
 
           <button
             onClick={() => setActiveTab('cleanup')}
-            className={`flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
+            className={`min-w-0 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
               activeTab === 'cleanup'
                 ? 'bg-white text-blue-600 shadow-md border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
@@ -300,7 +336,7 @@ export default function AdminDashboard() {
 
           <button
             onClick={() => setActiveTab('contacts')}
-            className={`flex-1 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
+            className={`min-w-0 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
               activeTab === 'contacts'
                 ? 'bg-white text-cyan-700 shadow-md border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
@@ -312,6 +348,23 @@ export default function AdminDashboard() {
               activeTab === 'contacts' ? 'bg-cyan-100 text-cyan-800' : 'bg-slate-300 text-slate-700'
             }`}>
               {contacts.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('members')}
+            className={`min-w-0 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
+              activeTab === 'members'
+                ? 'bg-white text-indigo-600 shadow-md border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+            }`}
+          >
+            <UserCog className="w-4 h-4 text-indigo-500 shrink-0" />
+            <span className="truncate">회원</span>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold font-mono ${
+              activeTab === 'members' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-300 text-slate-700'
+            }`}>
+              {members.length}
             </span>
           </button>
         </div>
@@ -414,6 +467,83 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'members' ? (
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="search"
+                value={memberQuery}
+                onChange={(e) => setMemberQuery(e.target.value)}
+                placeholder="이름 또는 이메일 검색"
+                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-200 shadow-sm"
+              />
+            </div>
+            {filteredMembers.length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300 text-slate-500 text-sm shadow-sm space-y-2">
+                <UserCog className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="font-semibold text-slate-600">
+                  {members.length === 0 ? '가입한 회원이 없습니다.' : '검색 결과가 없습니다.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {filteredMembers.map((member) => {
+                  const role = member.role || 'USER';
+                  const isSelf = member.id === user?.id;
+                  return (
+                    <div key={member.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm hover:shadow transition">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
+                        <div className="min-w-0 space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-base font-bold text-slate-900">{member.name || '이름 없음'}</span>
+                            <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${ROLE_BADGE_STYLES[role] ?? ROLE_BADGE_STYLES.USER}`}>
+                              {ROLE_LABELS[role] ?? role}
+                            </span>
+                            {isSelf && <span className="text-[11px] font-medium text-slate-400">내 계정</span>}
+                          </div>
+                          <p className="text-xs text-slate-500 truncate">{member.email}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={role}
+                            disabled={isSelf}
+                            onChange={(e) => handleChangeRole(member, e.target.value)}
+                            aria-label="회원 권한"
+                            className="px-3 py-1.5 font-bold text-slate-700 bg-slate-100 border border-slate-200 rounded-xl disabled:opacity-50"
+                          >
+                            {Object.entries(ROLE_LABELS).map(([value, label]) => (
+                              <option key={value} value={value}>{label}</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => handleDeleteMember(member)}
+                            disabled={isSelf}
+                            className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-600 border border-rose-200 rounded-xl transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+                          >
+                            탈퇴 처리
+                          </button>
+                        </div>
+                      </div>
+                      <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        {[
+                          ['연락처', member.phone],
+                          ['소속', member.affiliation],
+                          ['자격 등급', member.licenseGrade],
+                          ['가입일', member.createdAt && new Date(member.createdAt).toLocaleDateString()],
+                        ].map(([label, value]) => (
+                          <div key={label} className="min-w-0">
+                            <dt className="text-slate-400 mb-0.5">{label}</dt>
+                            <dd className="text-slate-700 font-medium truncate">{value || '-'}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
