@@ -133,3 +133,4 @@
 - [x] Rebuild contest page to match blueoceanguardians.org (hero, breadcrumb, 3 highlight cards, 4-step process); drop unverified dates, prize amounts and award names (`Contest.tsx`) <!-- id: 134 -->
 - [x] Remove `VITE_OPENAI_API_KEY` from Amplify environment variables (local `.env` line: remove manually) <!-- id: 135 -->
 - [x] Optimize uploads like exe-shop: client-side image resize (2000px, JPEG 85%, EXIF/GPS stripped), ASCII storage keys (Korean file names were silently rejected), 50MB per-file limit, notify users of failed attachments (`src/lib/optimizeImage.ts`, `src/lib/storageUpload.ts`, services, pages) <!-- id: 136 -->
+- [x] Remove the duplicate Contact link from the desktop header center nav (kept as the right-side button; mobile menu unchanged) (`Header.tsx`) <!-- id: 137 -->
