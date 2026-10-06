@@ -113,4 +113,9 @@
 - [ ] Apply `migrations/2026-10-06_rls_and_account_deletion.sql` in the Supabase SQL Editor (live DB) <!-- id: 114 -->
 - [ ] Fix archive board mapping: 'dokdo'/'cleanup' tab posts are stored as board_type 'notice' (`archiveService.ts`, `schema.sql`) <!-- id: 115 -->
 - [x] Replace simulated biometric login with native biometrics (Keystore/Keychain-protected credentials + real Supabase sign-in), hidden on web (`biometricService.ts`, `useBiometricSetting.ts`, `BiometricPasswordModal.tsx`, `Login.tsx`, `MyPage.tsx`, `AdminDashboard.tsx`) <!-- id: 116 -->
-- [ ] Test biometric register/login/disable on a real Android phone (and iOS Face ID) <!-- id: 117 -->
+- [x] Test biometric register/login on Android (emulator virtual fingerprint) <!-- id: 117 -->
+- [x] Remove login-less seed profiles from schema.sql seeds and add live cleanup SQL (`migrations/2026-10-07_remove_orphan_profiles.sql`) <!-- id: 118 -->
+- [x] Run `migrations/2026-10-07_remove_orphan_profiles.sql` in the Supabase SQL Editor (live DB) <!-- id: 119 -->
+- [x] Run `migrations/2026-10-07_remove_seed_posts.sql` to delete the dummy seed posts/comments from the live DB <!-- id: 120 -->
+- [x] Offer biometric login only with strong biometrics (fingerprint, Face ID, Class 3 face) so weak face-unlock-only Android phones are not offered a flow that cannot work (`biometricService.ts`) <!-- id: 121 -->
+- [ ] Test Face ID on a real iPhone (requires Mac + Xcode iOS build) <!-- id: 122 -->
