@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { AccessControl, BiometryType, NativeBiometric } from '@capgo/capacitor-native-biometric';
+import { AccessControl, AuthenticationStrength, BiometryType, NativeBiometric } from '@capgo/capacitor-native-biometric';
 
 // Keystore/Keychain entry holding the login; only readable after a live biometric check
 const CREDENTIAL_SERVER = 'com.blueoceanguardians.app';
@@ -42,15 +42,19 @@ export const biometricService = {
       return { isAvailable: false, biometryType: 'biometrics', isEnabled: false, registeredEmail: null };
     }
 
-    const { isAvailable, biometryType } = await NativeBiometric.isAvailable().catch(() => ({
+    const { isAvailable, authenticationStrength, biometryType } = await NativeBiometric.isAvailable().catch(() => ({
       isAvailable: false,
+      authenticationStrength: AuthenticationStrength.NONE,
       biometryType: BiometryType.NONE,
     }));
+    // Keystore/Keychain-bound credentials need strong biometrics (fingerprint, Face ID, Class 3 face);
+    // weak-only face unlock on many Android phones cannot unlock them
+    const hasStrongBiometrics = isAvailable && authenticationStrength === AuthenticationStrength.STRONG;
 
     return {
-      isAvailable,
+      isAvailable: hasStrongBiometrics,
       biometryType: toKind(biometryType),
-      isEnabled: isAvailable && Boolean(registeredEmail),
+      isEnabled: hasStrongBiometrics && Boolean(registeredEmail),
       registeredEmail,
     };
   },
