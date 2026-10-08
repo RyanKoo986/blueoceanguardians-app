@@ -68,28 +68,28 @@ export default function AdminDashboard() {
       navigate('/login');
       return;
     }
-    loadData();
-  }, [isAuthenticated, isAdmin, user]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [rData, cData, ctData, mData] = await Promise.all([
-        reportService.getReports(),
-        cleanupService.getCleanups(),
-        contactService.getContacts(),
-        authService.getAllUsers(),
-      ]);
-      setReports(rData);
-      setCleanups(cData);
-      setContacts(ctData);
-      setMembers(mData);
-    } catch (err) {
-      console.error('관리자 데이터 로드 실패:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [rData, cData, ctData, mData] = await Promise.all([
+          reportService.getReports(),
+          cleanupService.getCleanups(),
+          contactService.getContacts(),
+          authService.getAllUsers(),
+        ]);
+        setReports(rData);
+        setCleanups(cData);
+        setContacts(ctData);
+        setMembers(mData);
+      } catch (err) {
+        console.error('관리자 데이터 로드 실패:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [isAuthenticated, isAdmin, user, navigate]);
 
   const handleLogout = () => {
     logout();
@@ -100,7 +100,7 @@ export default function AdminDashboard() {
     try {
       await reportService.markAsRead(id);
       setReports(prev => prev.map(r => r.id === id ? { ...r, isRead: true } : r));
-    } catch (err) {
+    } catch {
       alert('읽음 처리에 실패했습니다.');
     }
   };
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
     try {
       await reportService.deleteReport(id);
       setReports(prev => prev.filter(r => r.id !== id));
-    } catch (err) {
+    } catch {
       alert('삭제에 실패했습니다.');
     }
   };
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
     try {
       await cleanupService.markAsRead(id);
       setCleanups(prev => prev.map(c => c.id === id ? { ...c, isRead: true } : c));
-    } catch (err) {
+    } catch {
       alert('확인 처리에 실패했습니다.');
     }
   };
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
     try {
       await cleanupService.deleteCleanup(id);
       setCleanups(prev => prev.filter(c => c.id !== id));
-    } catch (err) {
+    } catch {
       alert('삭제에 실패했습니다.');
     }
   };
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
     try {
       await contactService.markAsRead(id);
       setContacts(prev => prev.map(c => c.id === id ? { ...c, read: true } : c));
-    } catch (err) {
+    } catch {
       alert('확인 처리에 실패했습니다.');
     }
   };
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
     try {
       await contactService.deleteContact(id);
       setContacts(prev => prev.filter(c => c.id !== id));
-    } catch (err) {
+    } catch {
       alert('삭제에 실패했습니다.');
     }
   };

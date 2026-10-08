@@ -10,6 +10,7 @@
 - **Routing & State**: React Router DOM v6, React Context API (`AuthContext`)
 - **Styling & UI**: TailwindCSS v3 compiled at build time via PostCSS (`tailwind.config.js`, `postcss.config.js`, directives in `src/index.css`) + Vanilla CSS, Lucide React Icons, Framer Motion
   - Custom theme lives in `tailwind.config.js` (`brand-cyan`, `brand-navy`, `font-sans` Noto Sans KR, `animate-fade-in-up`, dark mode via `[data-theme="dark"]`). Never paste precompiled Tailwind output into `index.css` — unlisted classes silently fail.
+- **Linting**: ESLint 9 flat config (`eslint.config.js`): typescript-eslint, react-hooks v7 (React Compiler rules), react-refresh. `npm run lint` must report 0 errors before commit. Unused names follow the tsconfig `_` prefix convention. `no-explicit-any` and `react-hooks/set-state-in-effect` stay warnings until the existing usages are cleaned up.
 - **Internationalization**: i18next, react-i18next
 - **Backend & Database**: Supabase (PostgreSQL 15+, Custom Schema `dokdo_guardians`, Row Level Security, Supabase Storage)
 - **Mobile Packaging (Target)**: Capacitor (`@capacitor/core`, `@capacitor/android`, `@capacitor/ios`)

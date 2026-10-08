@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -72,21 +72,13 @@ export default function ArchivePage() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    loadPosts();
-    setCurrentPage(1);
-  }, [activeTab, user]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  const loadPosts = async () => {
+  const userId = user?.id;
+  const loadPosts = useCallback(async () => {
     try {
       setLoading(true);
       const data = await archiveService.getPosts(
         activeTab,
-        user?.id,
+        userId,
         isAdmin
       );
       setPosts(data);
@@ -96,7 +88,16 @@ export default function ArchivePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab, userId, isAdmin]);
+
+  useEffect(() => {
+    loadPosts();
+    setCurrentPage(1);
+  }, [loadPosts]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
