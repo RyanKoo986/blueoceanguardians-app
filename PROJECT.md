@@ -14,6 +14,7 @@
 - **Internationalization**: i18next, react-i18next
 - **Backend & Database**: Supabase (PostgreSQL 15+, Custom Schema `dokdo_guardians`, Row Level Security, Supabase Storage)
 - **Mobile Packaging (Target)**: Capacitor (`@capacitor/core`, `@capacitor/android`, `@capacitor/ios`)
+- **Native Config (not in git)**: `android/` and `ios/` are gitignored, so manual native settings (permissions, Info.plist usage descriptions, JDK 21, signing, versionCode) are recorded in `MOBILE_DEPLOYMENT_GUIDE.md`; re-apply them after `npx cap add`.
 - **App Display Name**: `Blue Guardians` (`capacitor.config.ts` appName, `index.html` title)
 - **AI Engine (GPT-4o)**: OpenAI GPT-4o called only from the Supabase Edge Function `dokdo-ai` (`supabase/functions/dokdo-ai/index.ts`, secret `OPENAI_API_KEY`, fixed tasks `factcheck`/`refine`/`expand`/`summarize`, max 5,000 chars); `aiService.ts` invokes it via `supabase.functions.invoke`. Never put the OpenAI key in a `VITE_*` variable. Deploy function changes by pasting the file into Dashboard > Edge Functions > dokdo-ai. `supabase/functions/tsconfig.json` + `deno-globals.d.ts` give VS Code Deno typings without the Deno extension (verify with `npx deno check supabase/functions/dokdo-ai/index.ts`). for real-time historical fact-checking, distortion correction, text refinement, and summarization with offline fallback.
 - **Authentication & App Policy**:

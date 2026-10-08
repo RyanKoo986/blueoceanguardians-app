@@ -68,7 +68,7 @@
 - **npm** >= 9.x
 - A [Supabase](https://supabase.com) account and project
 - *(Optional)* An [OpenAI](https://platform.openai.com) API key for AI features
-- *(Android builds)* [Android Studio](https://developer.android.com/studio) + JDK 17
+- *(Android builds)* [Android Studio](https://developer.android.com/studio) + JDK 21 (required by Capacitor 8; Gradle 8.14.3 cannot run on JDK 25)
 - *(iOS builds)* macOS with [Xcode](https://developer.apple.com/xcode/) 15+
 
 ---
