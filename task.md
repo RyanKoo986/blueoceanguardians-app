@@ -136,3 +136,4 @@
 - [x] Remove the duplicate Contact link from the desktop header center nav (kept as the right-side button; mobile menu unchanged) (`Header.tsx`) <!-- id: 137 -->
 - [x] Add ESLint 9 (`eslint.config.js`, `npm run lint`) and fix all errors: remove conditional hooks and unused globals from the router, declare `loadData`/`loadPosts` before their effects with complete deps, drop unused catch bindings (`router/index.ts`, `AdminDashboard.tsx`, `archive/page.tsx`, `BottomTabBar.tsx`, `home/page.tsx`) <!-- id: 138 -->
 - [ ] Replace the 49 `any` usages and the 6 `set-state-in-effect` patterns, then raise both rules to `error` (`eslint.config.js`) <!-- id: 139 -->
+- [x] Remove the footer nav row (About/Services/Archive/Contact): duplicates the fixed desktop header, hamburger menu and bottom tab bar; point KUDA homepage links to https://kuda.or.kr (www host has a certificate mismatch) (`FooterSection.tsx`, `Contact.tsx`) <!-- id: 140 -->

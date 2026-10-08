@@ -134,7 +134,7 @@ export default function Contact() {
                     WEBSITE
                   </span>
                   <a
-                    href="https://www.kuda.or.kr"
+                    href="https://kuda.or.kr"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-700 font-medium hover:text-blue-600 transition-colors"

@@ -7,34 +7,6 @@ export function FooterSection() {
       <div className="container mx-auto px-6">
         <div className="text-center space-y-12">
           
-          {/* Navigation Links */}
-          <div className="flex flex-wrap justify-center gap-8 text-sm font-medium">
-            <Link 
-              to="/about"
-              className="text-gray-500 hover:text-brand-cyan-600 transition-colors duration-300 cursor-pointer"
-            >
-              About
-            </Link>
-            <Link
-              to="/services/cleanup"
-              className="text-gray-500 hover:text-brand-cyan-600 transition-colors duration-300 cursor-pointer"
-            >
-              Services
-            </Link>
-            <Link 
-              to="/archive"
-              className="text-gray-500 hover:text-brand-cyan-600 transition-colors duration-300 cursor-pointer"
-            >
-              Archive
-            </Link>
-            <Link 
-              to="/contact"
-              className="text-gray-500 hover:text-brand-cyan-600 transition-colors duration-300 cursor-pointer"
-            >
-              Contact
-            </Link>
-          </div>
-
           {/* Social Media Icons */}
           <div className="flex items-center justify-center space-x-8">
             <a
@@ -73,7 +45,7 @@ export function FooterSection() {
             <p>
               인터넷 홈페이지 :{' '}
               <a
-                href="https://www.kuda.or.kr"
+                href="https://kuda.or.kr"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-brand-cyan-600 transition-colors duration-300"
