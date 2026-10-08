@@ -110,8 +110,8 @@
 - [x] Replace allow-all RLS with admin/owner-scoped policies, block role self-promotion, add signup/view-count/deletion RPCs (`migrations/2026-10-06_rls_and_account_deletion.sql`, `schema.sql`) <!-- id: 111 -->
 - [x] Add admin Members tab with search, role change and forced withdrawal (`AdminDashboard.tsx`, `authService.ts`) <!-- id: 112 -->
 - [x] Restore logged-in user synchronously so guarded pages like /admin survive reloads (`AuthContext.tsx`) <!-- id: 113 -->
-- [ ] Apply `migrations/2026-10-06_rls_and_account_deletion.sql` in the Supabase SQL Editor (live DB) <!-- id: 114 -->
-- [ ] Fix archive board mapping: 'dokdo'/'cleanup' tab posts are stored as board_type 'notice' (`archiveService.ts`, `schema.sql`) <!-- id: 115 -->
+- [x] Apply `migrations/2026-10-06_rls_and_account_deletion.sql` in the Supabase SQL Editor (live DB) <!-- id: 114 -->
+- [x] Fix archive board mapping: 'dokdo'/'cleanup' tab posts are stored as board_type 'notice' (`archiveService.ts`, `schema.sql`) (done in id 123) <!-- id: 115 -->
 - [x] Replace simulated biometric login with native biometrics (Keystore/Keychain-protected credentials + real Supabase sign-in), hidden on web (`biometricService.ts`, `useBiometricSetting.ts`, `BiometricPasswordModal.tsx`, `Login.tsx`, `MyPage.tsx`, `AdminDashboard.tsx`) <!-- id: 116 -->
 - [x] Test biometric register/login on Android (emulator virtual fingerprint) <!-- id: 117 -->
 - [x] Remove login-less seed profiles from schema.sql seeds and add live cleanup SQL (`migrations/2026-10-07_remove_orphan_profiles.sql`) <!-- id: 118 -->
@@ -134,3 +134,5 @@
 - [x] Remove `VITE_OPENAI_API_KEY` from Amplify environment variables (local `.env` line: remove manually) <!-- id: 135 -->
 - [x] Optimize uploads like exe-shop: client-side image resize (2000px, JPEG 85%, EXIF/GPS stripped), ASCII storage keys (Korean file names were silently rejected), 50MB per-file limit, notify users of failed attachments (`src/lib/optimizeImage.ts`, `src/lib/storageUpload.ts`, services, pages) <!-- id: 136 -->
 - [x] Remove the duplicate Contact link from the desktop header center nav (kept as the right-side button; mobile menu unchanged) (`Header.tsx`) <!-- id: 137 -->
+- [x] Add ESLint 9 (`eslint.config.js`, `npm run lint`) and fix all errors: remove conditional hooks and unused globals from the router, declare `loadData`/`loadPosts` before their effects with complete deps, drop unused catch bindings (`router/index.ts`, `AdminDashboard.tsx`, `archive/page.tsx`, `BottomTabBar.tsx`, `home/page.tsx`) <!-- id: 138 -->
+- [ ] Replace the 49 `any` usages and the 6 `set-state-in-effect` patterns, then raise both rules to `error` (`eslint.config.js`) <!-- id: 139 -->

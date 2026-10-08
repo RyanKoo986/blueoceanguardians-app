@@ -30,7 +30,7 @@ export default function HomePage() {
 
     try {
       sessionStorage.setItem('hasSeenIntro', 'true');
-    } catch (e) {
+    } catch {
       // ignore
     }
 

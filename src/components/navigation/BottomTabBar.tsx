@@ -28,7 +28,7 @@ export function BottomTabBar() {
         const h3 = await Keyboard.addListener('keyboardWillHide', () => setIsKeyboardVisible(false));
         const h4 = await Keyboard.addListener('keyboardDidHide', () => setIsKeyboardVisible(false));
         handles.push(h1, h2, h3, h4);
-      } catch (e) {
+      } catch {
         // Fallback to DOM detection
       }
     };
