@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { aiService, type FactCheckResponse } from '../../services/aiService';
 import { MAX_IMAGE_SOURCE_BYTES, MAX_UPLOAD_BYTES, failedUploadMessage } from '../../lib/storageUpload';
 import { archiveService } from '../../services/archiveService';
+import AiReportButton from '../../components/feature/AiReportButton';
 
 export default function AIFactCheck() {
   const { user, isAdmin } = useAuth();
@@ -276,7 +277,7 @@ ${failedUploadMessage(failedFiles)}` : '독도 자료가 성공적으로 등록�
                   실시간 AI 역사 왜곡 팩트체크
                 </div>
                 <p className="text-[11px] sm:text-xs text-purple-700">
-                  작성된 본문을 분석하여 왜곡된 표현(예: 다케시마, 일본해 등)을 점검하고 교정합니다.
+                  작성된 본문을 분석하여 왜곡된 표현(예: 다케시마, 일본해 등)을 점검하고 교정합니다. 본문은 분석을 위해 OpenAI(미국)로 전송되니 개인정보는 넣지 마세요.
                 </p>
               </div>
               <button
@@ -351,6 +352,10 @@ ${failedUploadMessage(failedFiles)}` : '독도 자료가 성공적으로 등록�
                     </p>
                   </div>
                 )}
+
+                <div className="flex justify-end">
+                  <AiReportButton result={aiResult} className="text-gray-500 hover:text-red-600" />
+                </div>
               </div>
             )}
 

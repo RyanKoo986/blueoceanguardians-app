@@ -10,8 +10,9 @@ import Aurora from '../home/components/Aurora';
 import { archiveService, type ArchivePost, type CreatePostData } from '../../services/archiveService';
 import { aiService } from '../../services/aiService';
 import { MAX_IMAGE_SOURCE_BYTES, MAX_UPLOAD_BYTES, failedUploadMessage } from '../../lib/storageUpload';
-import { moderationService, type ReportTarget } from '../../services/moderationService';
+import { moderationService, REPORT_REASONS, type ReportTarget } from '../../services/moderationService';
 import ReportDialog from '../../components/feature/ReportDialog';
+import AiReportButton from '../../components/feature/AiReportButton';
 
 type TabType = 'notice' | 'dokdo' | 'cleanup';
 
@@ -861,7 +862,7 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
                       실시간 AI 역사 왜곡 팩트체크
                     </div>
                     <p className="text-[11px] sm:text-xs text-purple-700">
-                      작성된 본문을 분석하여 왜곡된 표현(예: 다케시마, 일본해 등)을 점검하고 교정합니다.
+                      작성된 본문을 분석하여 왜곡된 표현(예: 다케시마, 일본해 등)을 점검하고 교정합니다. 본문은 분석을 위해 OpenAI(미국)로 전송되니 개인정보는 넣지 마세요.
                     </p>
                   </div>
                   <button
@@ -1319,7 +1320,8 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
                 </div>
               )}
 
-              <div className="flex justify-end gap-2.5 mt-6 pt-4 border-t border-white/10">
+              <div className="flex justify-end items-center gap-2.5 mt-6 pt-4 border-t border-white/10">
+                <AiReportButton result={factCheckResult} className="mr-auto text-gray-400 hover:text-red-400" />
                 <button
                   type="button"
                   onClick={() => setShowFactCheckModal(false)}
@@ -1357,7 +1359,14 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
           )}
       </AnimatePresence>
 
-      {reportTarget && <ReportDialog target={reportTarget} onClose={() => setReportTarget(null)} />}
+      {reportTarget && (
+        <ReportDialog
+          title={reportTarget.commentId ? '댓글 신고' : '게시글 신고'}
+          reasons={REPORT_REASONS}
+          onSubmit={(reason, detail) => moderationService.reportContent(reportTarget, reason, detail)}
+          onClose={() => setReportTarget(null)}
+        />
+      )}
     </div>
   );
 }
