@@ -146,3 +146,4 @@
 - [ ] Update Play Console: content rating (block/report = yes, online content = yes) and the reviewer instructions in 로그인 세부정보 (`play-store/README.md`) <!-- id: 147 -->
 - [x] Require "만 14세 이상" confirmation at signup (no guardian-consent flow), state it in the terms and privacy policy; Play target audience 13-15, 16-17, 18+ (`Signup.tsx`, `Terms.tsx`, `Privacy.tsx`) <!-- id: 148 -->
 - [x] Add the account and data deletion page for the Play Console deletion URLs, linked from the privacy policy (`AccountDeletion.tsx`, `/account-deletion`) <!-- id: 149 -->
+- [x] Enable R8 (minify + resource shrinking) for release to clear the Play "DEX code optimization" warning; resubmit as versionCode 2 (release APK smoke-tested on the emulator) (`android/app/build.gradle`, `MOBILE_DEPLOYMENT_GUIDE.md`) <!-- id: 150 -->

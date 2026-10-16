@@ -32,7 +32,8 @@
 - **빌드 메뉴**: `Build` → `Generate Signed Bundle / APK...` → `Android App Bundle`
 - **업로드 키(Upload Key)**: `C:\Users\USER\keystores\blueoceanguardians\upload-keystore.jks` (alias `upload`, 비밀번호는 같은 폴더 `keystore-info.txt`). 모든 업데이트는 이 키로 서명해야 하므로 폴더째 안전한 곳에 백업.
 - **산출물 위치**: `android/app/build/outputs/bundle/release/app-release.aab`
-- **업데이트 시**: `android/app/build.gradle`의 `versionCode`를 직전 업로드보다 크게 올린 뒤 빌드.
+- **업데이트 시**: `android/app/build.gradle`의 `versionCode`를 직전 업로드보다 크게 올린 뒤 빌드. 한 번 업로드한 번호는 출시하지 않았어도 재사용 불가 (첫 심사는 versionCode 2로 제출됨).
+- **R8 코드 최적화(필수)**: `android/app/build.gradle`의 `buildTypes.release`에 `minifyEnabled true`, `shrinkResources true`, `proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'`. 끄면 Play Console에 "DEX 코드 최적화가 기준점 미만"(난독화 비율 25% 미만) 경고가 뜸. Capacitor와 플러그인(@CapacitorPlugin, @PluginMethod)은 Capacitor의 보호 규칙으로 유지되며, 난독화 매핑 파일은 AAB(`BUNDLE-METADATA/.../proguard.map`)에 자동 포함됨. 설정을 바꾸면 출시용 APK(`assembleRelease`)를 에뮬레이터에 설치해 실행·로그인·키보드·생체인증을 확인할 것.
 - **Gradle JDK는 21 사용**: Android Studio의 Gradle JDK는 `temurin-21`로 설정되어 있음(`Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK`). 명령줄로 `gradlew`를 실행할 때는 `JAVA_HOME`을 JDK 21로 지정해야 함. Android Studio 내장 JDK(Java 25)로는 Gradle 8.14.3이 `Unsupported class file major version 69`로 실패.
 - **네이티브 권한 설정** (`android/`, `ios/`는 git 미포함이므로 `npx cap add`로 다시 만들면 재적용 필요):
   - `android/app/src/main/AndroidManifest.xml`: `<uses-permission android:name="android.permission.USE_BIOMETRIC" />` (`USE_FINGERPRINT`는 androidx.biometric이 자동 병합하므로 추가하지 않음. 파일 첨부는 `capture` 없는 시스템 파일 선택기라 카메라·저장소 권한 불필요)
