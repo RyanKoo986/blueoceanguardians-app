@@ -142,7 +142,29 @@ export const PrivacyPage: React.FC = () => {
           <section>
             <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
               <span className="w-1.5 h-4 bg-blue-500 rounded-full inline-block"></span>
-              7. 개인정보 보호책임자 및 문의처
+              7. 개인정보 처리 위탁 및 국외 이전
+            </h2>
+            <p className="mb-2">본 서비스는 원활한 서비스 제공을 위해 다음과 같이 개인정보 처리 업무를 위탁하고 있습니다.</p>
+            <ul className="list-disc list-inside space-y-1 pl-2 text-slate-400">
+              <li><strong>Supabase Inc.:</strong> 회원 인증, 데이터베이스 및 첨부파일 저장 (저장 위치: 대한민국 서울)</li>
+              <li><strong>Amazon Web Services, Inc.:</strong> 웹사이트 및 앱 화면 제공(호스팅)</li>
+              <li><strong>OpenAI, L.L.C.:</strong> AI 팩트체크 문장 분석</li>
+            </ul>
+            <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40 mt-3 text-sm space-y-1 text-slate-400">
+              <p className="font-medium text-white mb-1">국외 이전 (AI 팩트체크)</p>
+              <p>이전받는 자: OpenAI, L.L.C. (미국, privacy@openai.com)</p>
+              <p>이전 항목: 이용자가 AI 팩트체크를 요청한 글 본문</p>
+              <p>이전 일시·방법: AI 팩트체크를 실행할 때 암호화된 통신으로 전송</p>
+              <p>이용 목적: 역사 왜곡 표현 분석 및 교정 문장 생성</p>
+              <p>보유 기간: OpenAI API 데이터 정책에 따라 최대 30일 보관 후 삭제</p>
+              <p>거부 방법: AI 팩트체크를 사용하지 않으면 전송되지 않으며, 다른 기능은 그대로 이용할 수 있습니다. 분석할 글에는 개인정보를 넣지 마세요.</p>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <span className="w-1.5 h-4 bg-blue-500 rounded-full inline-block"></span>
+              8. 개인정보 보호책임자 및 문의처
             </h2>
             <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40 text-sm space-y-1">
               <p><span className="text-slate-500">책임자/운영팀:</span> <span className="text-white">사단법인 대한잠수협회</span></p>

@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { contactService } from './contactService';
 
 // Google Play UGC policy: members report objectionable posts/comments and block other members
 
@@ -10,6 +11,15 @@ export const REPORT_REASONS: Record<ReportReason, string> = {
   hate: '폭력·혐오·괴롭힘',
   privacy: '개인정보 노출',
   misinformation: '허위 정보·역사 왜곡',
+  other: '기타',
+};
+
+export type AiReportReason = 'inaccurate' | 'distortion' | 'offensive' | 'other';
+
+export const AI_REPORT_REASONS: Record<AiReportReason, string> = {
+  inaccurate: '부정확하거나 사실과 다른 내용',
+  distortion: '역사 왜곡',
+  offensive: '불쾌하거나 부적절한 표현',
   other: '기타',
 };
 
@@ -50,6 +60,7 @@ interface ContentReportRow {
 }
 
 const UNIQUE_VIOLATION = '23505';
+const MAX_REPORTED_AI_OUTPUT = 2000;
 
 const client = () => {
   if (!isSupabaseConfigured || !supabase) throw new Error('서버에 연결되어 있지 않습니다.');
@@ -96,6 +107,24 @@ export const moderationService = {
   async dismissReport(id: string): Promise<void> {
     const { error } = await client().from('content_reports').delete().eq('id', id);
     if (error) throw new Error(error.message || '신고 처리에 실패했습니다.');
+  },
+
+  // Google Play AI-generated content policy: AI output can be flagged in-app, also by guests.
+  // Reports reach the admin "1:1 문의" tab, which already lists anonymous submissions.
+  async reportAiOutput(
+    output: string,
+    reason: AiReportReason,
+    detail: string,
+    reporter: { name?: string; email?: string }
+  ): Promise<void> {
+    const lines = [`[AI 결과 신고] ${AI_REPORT_REASONS[reason]}`];
+    if (detail.trim()) lines.push(`설명: ${detail.trim()}`);
+    lines.push('', 'AI 결과:', output.slice(0, MAX_REPORTED_AI_OUTPUT));
+    await contactService.submitContact({
+      name: reporter.name || '비회원',
+      email: reporter.email || '-',
+      message: lines.join('\n'),
+    });
   },
 
   async getBlockedUsers(): Promise<BlockedUser[]> {
