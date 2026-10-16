@@ -73,6 +73,7 @@ export const PrivacyPage: React.FC = () => {
                 <p className="font-medium text-white mb-1">선택 수집 항목 (입력한 경우에만)</p>
                 <p className="text-slate-400 text-sm">생년월일, 소속 단체·기관, 잠수 라이선스 등급</p>
               </div>
+              <p className="text-slate-400 text-sm">만 14세 미만 아동은 회원가입을 할 수 없으며, 본 서비스는 만 14세 미만 아동의 개인정보를 수집하지 않습니다.</p>
               <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40">
                 <p className="font-medium text-white mb-1">서비스 이용 과정에서 생성되는 정보</p>
                 <p className="text-slate-400 text-sm">접속 로그, 접속 IP 정보, 서비스 이용 기록, 업로드한 활동 사진 및 제보 내용, 게시물 신고 및 회원 차단 내역</p>

@@ -80,7 +80,7 @@ Blue Guardians(블루 가디언즈)는 사단법인 대한잠수협회(KUDA)와 
 | 광고 | 아니요 (광고 SDK 없음) |
 | 광고 ID | 사용 안 함 (`AD_ID` 권한 없음) |
 | 콘텐츠 등급 | 앱 유형 "다른 모든 앱 유형". 폭력·선정성·언어·약물·도박: 모두 아니요. **사용자 간 상호작용/콘텐츠 공유: 예** (게시글·댓글·사진 업로드). 사용자 공유 콘텐츠가 주요 출처: 아니요. **사용자·UGC 차단: 예, 신고: 예** (2026-10-16 추가). 채팅 조정, 초대 친구 제한: 아니요. **온라인 콘텐츠: 예** (서버의 게시물, AI 팩트체크 생성 문장). 위치 공유: 아니요. 디지털 상품 구매: 아니요. 웹 브라우저/검색엔진: 아니요 |
-| 타겟층 | **18세 이상** 권장. 어린이의 관심을 끌 수 있는 앱: 아니요 (만 14세 미만은 회원가입 시 보호자 동의가 필요하고, 13세 미만을 넣으면 가족 정책 심사가 추가됨) |
+| 타겟층 | **13~15세, 16~17세, 만 18세 이상** (캠페인 주 대상이 10~20대). 12세 이하는 넣지 않음(가족 정책 심사). 만 14세 미만은 법정대리인 동의가 필요해 회원가입에서 "[필수] 만 14세 이상입니다"로 막고, 로그인 없는 기능만 이용 가능 |
 | 뉴스 앱 | 아니요 |
 | 정부 앱 | 아니요 (정부 기관이 개발·운영하지 않음) |
 | 금융 기능, 건강 앱 | 해당 없음 |
@@ -95,13 +95,12 @@ Blue Guardians(블루 가디언즈)는 사단법인 대한잠수협회(KUDA)와 
 - 업데이트 심사 때마다 다시 쓰이므로 비밀번호를 바꾸지 말고, 심사자가 탈퇴시켰을 수 있으니 업데이트 전에 로그인을 확인합니다.
 - 심사자가 신고·차단 버튼을 볼 수 있도록 게시판에 다른 계정이 쓴 게시글이 하나 이상 있어야 합니다.
 
-**기타 정보** 칸:
+**기타 정보** 칸 (Play Console 제한 500자, 현재 약 400자):
 ```
-1. Tap "MY" in the bottom tab bar (or menu ☰ → 로그인) and sign in with the email and password above.
-2. Logged-in features: Archive tab → write posts/comments on the "독도 자료" and "수중 정화 활동" boards; MY tab → profile, blocked members list, optional biometric login toggle, account deletion (회원 탈퇴).
-3. Report and block: open another member's post and tap "신고" (report) or "차단" (block); each comment has the same links. Blocked members' posts and comments are hidden and can be unblocked in MY.
-4. Biometric login is optional. It is enabled in MY after a password login and needs a fingerprint or face enrolled on the device.
-5. The admin dashboard is for association staff only and is not available to regular members.
+1. Tap "MY" in the bottom tab bar and sign in with the account above.
+2. Archive tab: write posts and comments. MY tab: profile, blocked members, optional biometric login, account deletion.
+3. Report/block: open another member's post and tap "신고" (report) or "차단" (block); comments have the same links. Blocked members are hidden and can be unblocked in MY.
+4. The admin dashboard is staff-only.
 ```
 
 ## 5. 데이터 보안

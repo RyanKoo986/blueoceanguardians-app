@@ -26,6 +26,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [checkStatus, setCheckStatus] = useState<DuplicateCheckStatus>('idle');
   const [checkedEmail, setCheckedEmail] = useState('');
+  const [agreeAge, setAgreeAge] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
@@ -105,6 +106,11 @@ const Signup = () => {
 
     if (!formData.phone.trim()) {
       return '휴대폰번호를 입력해주세요.';
+    }
+
+    // 개인정보 보호법: 만 14세 미만은 법정대리인 동의가 필요하므로 가입을 받지 않음
+    if (!agreeAge) {
+      return '만 14세 이상만 회원가입할 수 있습니다.';
     }
 
     if (!agreeTerms || !agreePrivacy) {
@@ -376,6 +382,17 @@ const Signup = () => {
 
             {/* Required consents: Google Play UGC policy (terms before posting) and 개인정보 보호법 */}
             <div className="space-y-2.5 pt-4 border-t border-gray-100">
+              <label className="flex items-start gap-2 text-xs sm:text-sm text-gray-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreeAge}
+                  onChange={(e) => setAgreeAge(e.target.checked)}
+                  className="mt-0.5 accent-blue-600"
+                />
+                <span>
+                  <span className="text-red-500 font-bold">[필수]</span> 만 14세 이상입니다.
+                </span>
+              </label>
               <label className="flex items-start gap-2 text-xs sm:text-sm text-gray-700 cursor-pointer">
                 <input
                   type="checkbox"
