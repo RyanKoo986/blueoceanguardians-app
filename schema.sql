@@ -15,6 +15,8 @@ CREATE SCHEMA IF NOT EXISTS dokdo_guardians;
 SET search_path TO dokdo_guardians, public;
 
 -- 2. Clean Drop (Safe Resets with CASCADE)
+DROP TABLE IF EXISTS dokdo_guardians.user_blocks CASCADE;
+DROP TABLE IF EXISTS dokdo_guardians.content_reports CASCADE;
 DROP TABLE IF EXISTS dokdo_guardians.contacts CASCADE;
 DROP TABLE IF EXISTS dokdo_guardians.report_files CASCADE;
 DROP TABLE IF EXISTS dokdo_guardians.reports CASCADE;
@@ -78,6 +80,28 @@ CREATE TABLE dokdo_guardians.archive_comments (
     content TEXT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- [Content Reports] 게시글·댓글 신고 (Google Play UGC 정책, 관리자만 열람)
+CREATE TABLE dokdo_guardians.content_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    reporter_id UUID NOT NULL DEFAULT auth.uid() REFERENCES dokdo_guardians.profiles(id) ON DELETE CASCADE,
+    post_id UUID NOT NULL REFERENCES dokdo_guardians.archive_posts(id) ON DELETE CASCADE,
+    comment_id UUID REFERENCES dokdo_guardians.archive_comments(id) ON DELETE CASCADE,
+    reason TEXT NOT NULL CHECK (reason IN ('spam', 'sexual', 'hate', 'privacy', 'misinformation', 'other')),
+    detail TEXT CHECK (char_length(detail) <= 500),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE NULLS NOT DISTINCT (reporter_id, post_id, comment_id)
+);
+
+-- [User Blocks] 회원 차단 (차단한 회원의 게시글·댓글을 숨김)
+CREATE TABLE dokdo_guardians.user_blocks (
+    blocker_id UUID NOT NULL DEFAULT auth.uid() REFERENCES dokdo_guardians.profiles(id) ON DELETE CASCADE,
+    blocked_id UUID NOT NULL REFERENCES dokdo_guardians.profiles(id) ON DELETE CASCADE,
+    blocked_name TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    PRIMARY KEY (blocker_id, blocked_id),
+    CHECK (blocker_id <> blocked_id)
 );
 
 -- [Cleanup Requests] 해양 정화 활동 신청
@@ -150,6 +174,8 @@ ALTER TABLE dokdo_guardians.cleanup_files ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dokdo_guardians.reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dokdo_guardians.report_files ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dokdo_guardians.contacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE dokdo_guardians.content_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE dokdo_guardians.user_blocks ENABLE ROW LEVEL SECURITY;
 
 -- Helper: caller is an ADMIN of this app (SECURITY DEFINER bypasses RLS, so no policy recursion)
 CREATE OR REPLACE FUNCTION dokdo_guardians.is_admin()
@@ -162,7 +188,7 @@ AS $$
   );
 $$;
 
--- Helper: guests may attach files to their own just-created anonymous posts
+-- Helper: only the post's author (or an admin) may attach files
 CREATE OR REPLACE FUNCTION dokdo_guardians.can_attach_to_post(target_post uuid)
 RETURNS boolean
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = ''
@@ -170,7 +196,7 @@ AS $$
   SELECT EXISTS (
     SELECT 1 FROM dokdo_guardians.archive_posts p
     WHERE p.id = target_post
-      AND (p.author_id IS NULL OR p.author_id = auth.uid() OR dokdo_guardians.is_admin())
+      AND (p.author_id = auth.uid() OR dokdo_guardians.is_admin())
   );
 $$;
 
@@ -204,10 +230,10 @@ CREATE POLICY "profiles_update_own_or_admin" ON dokdo_guardians.profiles
 -- Archive posts: public posts for everyone, private posts for author/admin
 CREATE POLICY "posts_select_visible" ON dokdo_guardians.archive_posts
   FOR SELECT USING (visibility = 'public' OR author_id = auth.uid() OR dokdo_guardians.is_admin());
--- Notices (공지사항) are admin-only
-CREATE POLICY "posts_insert_as_self_or_guest" ON dokdo_guardians.archive_posts
+-- Only signed-in members publish posts; notices (공지사항) are admin-only
+CREATE POLICY "posts_insert_as_member" ON dokdo_guardians.archive_posts
   FOR INSERT WITH CHECK (
-    (author_id IS NULL OR author_id = auth.uid())
+    auth.uid() IS NOT NULL AND author_id = auth.uid()
     AND (board_type <> 'notice' OR dokdo_guardians.is_admin())
   );
 CREATE POLICY "posts_update_author_or_admin" ON dokdo_guardians.archive_posts
@@ -231,6 +257,16 @@ CREATE POLICY "comments_update_author_or_admin" ON dokdo_guardians.archive_comme
   WITH CHECK (author_id = auth.uid() OR dokdo_guardians.is_admin());
 CREATE POLICY "comments_delete_author_or_admin" ON dokdo_guardians.archive_comments
   FOR DELETE USING (author_id = auth.uid() OR dokdo_guardians.is_admin());
+
+-- Content reports: members file them, only admins can read or resolve them
+CREATE POLICY "content_reports_insert_member" ON dokdo_guardians.content_reports
+  FOR INSERT WITH CHECK (reporter_id = auth.uid());
+CREATE POLICY "content_reports_admin_manage" ON dokdo_guardians.content_reports
+  FOR ALL USING (dokdo_guardians.is_admin()) WITH CHECK (dokdo_guardians.is_admin());
+
+-- User blocks: each member manages only their own block list
+CREATE POLICY "user_blocks_own" ON dokdo_guardians.user_blocks
+  FOR ALL USING (blocker_id = auth.uid()) WITH CHECK (blocker_id = auth.uid());
 
 -- Guest submissions: anyone can submit, only admins can read/manage
 CREATE POLICY "cleanup_insert_anyone" ON dokdo_guardians.cleanup_requests

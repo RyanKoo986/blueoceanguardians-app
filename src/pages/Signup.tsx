@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, AlertCircle, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
 import { authService } from '../services/authService';
+import { TermsModal } from './Terms';
 
 type DuplicateCheckStatus = 'idle' | 'checking' | 'available' | 'duplicate';
 
@@ -25,6 +26,9 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [checkStatus, setCheckStatus] = useState<DuplicateCheckStatus>('idle');
   const [checkedEmail, setCheckedEmail] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
   const { signup } = useAuth();
   const navigate = useNavigate();
@@ -101,6 +105,10 @@ const Signup = () => {
 
     if (!formData.phone.trim()) {
       return '휴대폰번호를 입력해주세요.';
+    }
+
+    if (!agreeTerms || !agreePrivacy) {
+      return '필수 약관에 모두 동의해주세요.';
     }
 
     return null;
@@ -366,6 +374,42 @@ const Signup = () => {
               )}
             </div>
 
+            {/* Required consents: Google Play UGC policy (terms before posting) and 개인정보 보호법 */}
+            <div className="space-y-2.5 pt-4 border-t border-gray-100">
+              <label className="flex items-start gap-2 text-xs sm:text-sm text-gray-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="mt-0.5 accent-blue-600"
+                />
+                <span>
+                  <span className="text-red-500 font-bold">[필수]</span> 이용약관에 동의합니다.{' '}
+                  <button type="button" onClick={() => setShowTerms(true)} className="text-blue-600 underline">
+                    보기
+                  </button>
+                </span>
+              </label>
+              <label className="flex items-start gap-2 text-xs sm:text-sm text-gray-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreePrivacy}
+                  onChange={(e) => setAgreePrivacy(e.target.checked)}
+                  className="mt-0.5 accent-blue-600"
+                />
+                <span>
+                  <span className="text-red-500 font-bold">[필수]</span> 개인정보 수집·이용에 동의합니다.
+                </span>
+              </label>
+              <div className="ml-6 text-[11px] sm:text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg p-3 leading-relaxed space-y-0.5">
+                <p>수집 항목: 이메일, 비밀번호, 이름, 휴대폰번호</p>
+                <p>선택 항목(생년월일, 소속, 잠수 라이선스 등급)은 입력한 경우에만 수집합니다.</p>
+                <p>이용 목적: 회원 식별, 게시판 등 서비스 제공, 문의 응대</p>
+                <p>보유 기간: 회원 탈퇴 시까지 (법령에 보존 의무가 있으면 해당 기간)</p>
+                <p>동의를 거부할 수 있으며, 거부하면 회원가입을 할 수 없습니다.</p>
+              </div>
+            </div>
+
             {error && (
               <div className="text-red-600 text-xs sm:text-sm text-center bg-red-50 px-4 py-2.5 rounded-xl border border-red-100 whitespace-pre-line leading-relaxed">
                 {error}
@@ -391,6 +435,8 @@ const Signup = () => {
           </form>
         </div>
       </div>
+
+      {showTerms && <TermsModal onClose={() => setShowTerms(false)} />}
     </div>
   );
 };

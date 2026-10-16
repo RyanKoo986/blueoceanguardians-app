@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { biometricLabel } from '../services/biometricService';
 import { useBiometricSetting } from '../hooks/useBiometricSetting';
 import BiometricPasswordModal from '../components/common/BiometricPasswordModal';
+import BlockedUsersSection from '../components/feature/BlockedUsersSection';
 
 export default function MyPage() {
   const { user, isAuthenticated, logout, deleteAccount } = useAuth();
@@ -241,6 +242,8 @@ export default function MyPage() {
             onClose={biometric.closePasswordPrompt}
           />
         )}
+
+        <BlockedUsersSection />
 
         {/* Account Actions */}
         <div className="bg-slate-800/40 border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">

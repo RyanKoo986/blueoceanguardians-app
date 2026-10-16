@@ -23,7 +23,7 @@ export const PrivacyPage: React.FC = () => {
             <ArrowLeft className="w-4 h-4" />
             뒤로가기
           </button>
-          <span className="text-xs text-slate-500">최종 수정일: 2026. 10. 06</span>
+          <span className="text-xs text-slate-500">최종 수정일: 2026. 10. 16</span>
         </div>
 
         {/* Title */}
@@ -67,11 +67,15 @@ export const PrivacyPage: React.FC = () => {
             <div className="space-y-3">
               <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40">
                 <p className="font-medium text-white mb-1">필수 수집 항목</p>
-                <p className="text-slate-400 text-sm">이메일 주소, 비밀번호, 닉네임(이름)</p>
+                <p className="text-slate-400 text-sm">이메일 주소, 비밀번호, 이름, 휴대폰번호</p>
+              </div>
+              <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40">
+                <p className="font-medium text-white mb-1">선택 수집 항목 (입력한 경우에만)</p>
+                <p className="text-slate-400 text-sm">생년월일, 소속 단체·기관, 잠수 라이선스 등급</p>
               </div>
               <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/40">
                 <p className="font-medium text-white mb-1">서비스 이용 과정에서 생성되는 정보</p>
-                <p className="text-slate-400 text-sm">접속 로그, 접속 IP 정보, 서비스 이용 기록, 업로드한 활동 사진 및 제보 내용</p>
+                <p className="text-slate-400 text-sm">접속 로그, 접속 IP 정보, 서비스 이용 기록, 업로드한 활동 사진 및 제보 내용, 게시물 신고 및 회원 차단 내역</p>
               </div>
             </div>
           </section>
