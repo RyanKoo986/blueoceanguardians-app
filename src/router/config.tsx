@@ -17,6 +17,7 @@ const Contest = lazy(() => import('../pages/services/Contest'));
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
 const PrivacyPage = lazy(() => import('../pages/Privacy'));
 const TermsPage = lazy(() => import('../pages/Terms'));
+const AccountDeletionPage = lazy(() => import('../pages/AccountDeletion'));
 const ResetPassword = lazy(() => import('../pages/ResetPassword'));
 
 const LoadingFallback = () => (
@@ -135,6 +136,14 @@ const routes: RouteObject[] = [
     element: (
       <Suspense fallback={<LoadingFallback />}>
         <TermsPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/account-deletion',
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <AccountDeletionPage />
       </Suspense>
     ),
   },
