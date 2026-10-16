@@ -63,6 +63,9 @@ export function FooterSection() {
           <div className="flex flex-col space-y-2">
             <span className="text-gray-400 text-sm">© {new Date().getFullYear()} Blue Guardians. All rights reserved.</span>
             <div className="flex justify-center space-x-4 text-sm text-gray-500">
+              <Link to="/terms" className="hover:text-brand-cyan-600 transition-colors duration-300">
+                이용약관
+              </Link>
               <Link to="/privacy" className="hover:text-brand-cyan-600 transition-colors duration-300">
                 개인정보처리방침
               </Link>

@@ -16,6 +16,7 @@ const Contact = lazy(() => import('../pages/Contact'));
 const Contest = lazy(() => import('../pages/services/Contest'));
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
 const PrivacyPage = lazy(() => import('../pages/Privacy'));
+const TermsPage = lazy(() => import('../pages/Terms'));
 const ResetPassword = lazy(() => import('../pages/ResetPassword'));
 
 const LoadingFallback = () => (
@@ -126,6 +127,14 @@ const routes: RouteObject[] = [
     element: (
       <Suspense fallback={<LoadingFallback />}>
         <PrivacyPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/terms',
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <TermsPage />
       </Suspense>
     ),
   },

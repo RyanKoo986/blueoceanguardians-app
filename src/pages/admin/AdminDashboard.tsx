@@ -13,13 +13,16 @@ import {
   Mail,
   LogOut,
   UserCog,
-  Search
+  Search,
+  Flag
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { reportService, type ReportItem } from '../../services/reportService';
 import { cleanupService, type CleanupItem } from '../../services/cleanupService';
 import { contactService, type ContactForm } from '../../services/contactService';
 import { authService } from '../../services/authService';
+import { archiveService } from '../../services/archiveService';
+import { moderationService, REPORT_REASONS, type ContentReport } from '../../services/moderationService';
 import { biometricLabel } from '../../services/biometricService';
 import { useBiometricSetting } from '../../hooks/useBiometricSetting';
 import BiometricPasswordModal from '../../components/common/BiometricPasswordModal';
@@ -42,13 +45,14 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const initialTab = (location.state as any)?.tab;
-  const [activeTab, setActiveTab] = useState<'reports' | 'cleanup' | 'contacts' | 'members'>(
-    initialTab && ['reports', 'cleanup', 'contacts', 'members'].includes(initialTab) ? initialTab : 'reports'
+  const [activeTab, setActiveTab] = useState<'reports' | 'cleanup' | 'contacts' | 'members' | 'moderation'>(
+    initialTab && ['reports', 'cleanup', 'contacts', 'members', 'moderation'].includes(initialTab) ? initialTab : 'reports'
   );
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [cleanups, setCleanups] = useState<CleanupItem[]>([]);
   const [contacts, setContacts] = useState<ContactForm[]>([]);
   const [members, setMembers] = useState<User[]>([]);
+  const [contentReports, setContentReports] = useState<ContentReport[]>([]);
   const [memberQuery, setMemberQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -72,16 +76,22 @@ export default function AdminDashboard() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [rData, cData, ctData, mData] = await Promise.all([
+        const [rData, cData, ctData, mData, crData] = await Promise.all([
           reportService.getReports(),
           cleanupService.getCleanups(),
           contactService.getContacts(),
           authService.getAllUsers(),
+          // A failure here (e.g. migration not applied yet) must not hide the other tabs
+          moderationService.getReports().catch((error) => {
+            console.error('게시물 신고 로드 실패:', error);
+            return [];
+          }),
         ]);
         setReports(rData);
         setCleanups(cData);
         setContacts(ctData);
         setMembers(mData);
+        setContentReports(crData);
       } catch (err) {
         console.error('관리자 데이터 로드 실패:', err);
       } finally {
@@ -112,6 +122,31 @@ export default function AdminDashboard() {
       setReports(prev => prev.filter(r => r.id !== id));
     } catch {
       alert('삭제에 실패했습니다.');
+    }
+  };
+
+  const handleRemoveReportedContent = async (report: ContentReport) => {
+    if (!confirm(`신고된 ${report.commentId ? '댓글' : '게시글'}을 삭제하시겠습니까?`)) return;
+    try {
+      if (report.commentId) {
+        await archiveService.deleteComment('', report.postId, report.commentId);
+      } else {
+        await archiveService.deletePost('', report.postId);
+      }
+      // Deleting content also deletes its reports (cascade), so reload the list from the server
+      setContentReports(await moderationService.getReports());
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '삭제에 실패했습니다.');
+    }
+  };
+
+  const handleDismissContentReport = async (id: string) => {
+    if (!confirm('이 신고를 기각하시겠습니까? 콘텐츠는 그대로 유지됩니다.')) return;
+    try {
+      await moderationService.dismissReport(id);
+      setContentReports((prev) => prev.filter((report) => report.id !== id));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '신고 처리에 실패했습니다.');
     }
   };
 
@@ -299,7 +334,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Tab Navigation - Modern Segmented Control */}
-        <div className="bg-slate-200/80 p-1.5 rounded-2xl grid grid-cols-2 sm:grid-cols-4 gap-1.5 shadow-inner">
+        <div className="bg-slate-200/80 p-1.5 rounded-2xl grid grid-cols-2 sm:grid-cols-5 gap-1.5 shadow-inner">
           <button
             onClick={() => setActiveTab('reports')}
             className={`min-w-0 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
@@ -365,6 +400,23 @@ export default function AdminDashboard() {
               activeTab === 'members' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-300 text-slate-700'
             }`}>
               {members.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('moderation')}
+            className={`min-w-0 py-3 px-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 ${
+              activeTab === 'moderation'
+                ? 'bg-white text-orange-600 shadow-md border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+            }`}
+          >
+            <Flag className="w-4 h-4 text-orange-500 shrink-0" />
+            <span className="truncate">게시물 신고</span>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold font-mono ${
+              activeTab === 'moderation' ? 'bg-orange-100 text-orange-700' : 'bg-slate-300 text-slate-700'
+            }`}>
+              {contentReports.length}
             </span>
           </button>
         </div>
@@ -465,6 +517,54 @@ export default function AdminDashboard() {
                     {item.message && (
                       <p className="text-xs sm:text-sm text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed">{item.message}</p>
                     )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'moderation' ? (
+          <div className="space-y-4">
+            {contentReports.length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300 text-slate-500 text-sm shadow-sm space-y-2">
+                <Flag className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="font-semibold text-slate-600">접수된 게시물 신고가 없습니다.</p>
+                <p className="text-xs text-slate-400">회원이 게시글이나 댓글을 신고하면 이곳에 표시됩니다.</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {contentReports.map((report) => (
+                  <div key={report.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-3 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold border bg-orange-50 text-orange-700 border-orange-200">
+                          {report.commentId ? '댓글' : '게시글'} · {REPORT_REASONS[report.reason]}
+                        </span>
+                        <span className="text-xs text-slate-400 font-medium">
+                          {new Date(report.createdAt).toLocaleDateString()} · 신고자 {report.reporterName}
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleDismissContentReport(report.id)}
+                          className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 rounded-xl border border-slate-200 transition active:scale-95"
+                        >
+                          기각
+                        </button>
+                        <button
+                          onClick={() => handleRemoveReportedContent(report)}
+                          className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-600 border border-rose-200 rounded-xl transition active:scale-95"
+                        >
+                          {report.commentId ? '댓글 삭제' : '게시글 삭제'}
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      게시글 <span className="font-semibold text-slate-700">{report.postTitle}</span> · 작성자 {report.targetAuthorName}
+                    </p>
+                    <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100 whitespace-pre-line max-h-40 overflow-y-auto">
+                      {report.targetContent}
+                    </p>
+                    {report.detail && <p className="text-xs text-slate-500">신고 내용: {report.detail}</p>}
                   </div>
                 ))}
               </div>

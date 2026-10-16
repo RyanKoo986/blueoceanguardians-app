@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ChevronRight, FileText, Bell, Plus, X, Trash2, Lock, Globe, Upload, Sparkles, Edit2, MessageSquare, Send, Camera } from 'lucide-react';
+import { Search, ChevronRight, FileText, Bell, Plus, X, Trash2, Lock, Globe, Upload, Sparkles, Edit2, MessageSquare, Send, Camera, Flag, Ban } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { CursorGlow } from '../home/components/CursorGlow';
 import Aurora from '../home/components/Aurora';
@@ -10,6 +10,8 @@ import Aurora from '../home/components/Aurora';
 import { archiveService, type ArchivePost, type CreatePostData } from '../../services/archiveService';
 import { aiService } from '../../services/aiService';
 import { MAX_IMAGE_SOURCE_BYTES, MAX_UPLOAD_BYTES, failedUploadMessage } from '../../lib/storageUpload';
+import { moderationService, type ReportTarget } from '../../services/moderationService';
+import ReportDialog from '../../components/feature/ReportDialog';
 
 type TabType = 'notice' | 'dokdo' | 'cleanup';
 
@@ -62,6 +64,8 @@ export default function ArchivePage() {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editCommentContent, setEditCommentContent] = useState('');
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [blockedIds, setBlockedIds] = useState<Set<string>>(new Set());
+  const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
 
   const isAdmin = user?.role === 'ADMIN' || user?.id === 'admin';
 
@@ -98,6 +102,16 @@ export default function ArchivePage() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
+
+  // Posts and comments of members this user has blocked are hidden
+  useEffect(() => {
+    if (!userId) return;
+    moderationService
+      .getBlockedUsers()
+      .then((blocked) => setBlockedIds(new Set(blocked.map((member) => member.id))))
+      .catch((error) => console.error('차단 목록 로드 실패:', error));
+  }, [userId]);
+  const isBlocked = (authorId: string) => Boolean(userId) && blockedIds.has(authorId);
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
@@ -298,6 +312,30 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
     }
   };
 
+  // Reports and block lists belong to a member, so both need a login
+  const requireLogin = () => {
+    if (isAuthenticated) return true;
+    if (confirm('로그인 후 이용할 수 있습니다. 로그인하시겠습니까?')) navigate('/login');
+    return false;
+  };
+
+  const handleReport = (target: ReportTarget) => {
+    if (requireLogin()) setReportTarget(target);
+  };
+
+  const handleBlock = async (authorId: string, authorName: string) => {
+    if (!requireLogin()) return;
+    if (!confirm(`${authorName}님을 차단할까요?
+차단하면 이 회원의 게시글과 댓글이 보이지 않습니다. 마이페이지에서 언제든 해제할 수 있습니다.`)) return;
+    try {
+      await moderationService.blockUser({ id: authorId, name: authorName });
+      setBlockedIds((prev) => new Set(prev).add(authorId));
+      if (selectedPost?.authorId === authorId) setSelectedPost(null);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '차단에 실패했습니다.');
+    }
+  };
+
   const handleShare = (platform: 'x' | 'threads') => {
     if (!createdPost) return;
     const url = window.location.href;
@@ -352,8 +390,9 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.content.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesSearch;
+    return matchesSearch && !isBlocked(post.authorId);
   });
+  const visibleComments = selectedPost?.comments?.filter((comment) => !isBlocked(comment.authorId)) ?? [];
 
   const indexOfLastPost = currentPage * ITEMS_PER_PAGE;
   const indexOfFirstPost = indexOfLastPost - ITEMS_PER_PAGE;
@@ -1089,6 +1128,22 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
                          <Trash2 size={16} /> 삭제
                        </button>
                      )}
+                     {selectedPost.authorId !== user?.id && !isAdmin && (
+                       <button
+                         onClick={() => handleReport({ postId: selectedPost.id })}
+                         className="flex items-center gap-1 px-4 py-2 bg-white text-gray-500 border border-gray-200 rounded hover:bg-gray-50 transition-colors font-medium text-sm"
+                       >
+                         <Flag size={16} /> 신고
+                       </button>
+                     )}
+                     {selectedPost.authorId && selectedPost.authorId !== user?.id && !isAdmin && (
+                       <button
+                         onClick={() => handleBlock(selectedPost.authorId, selectedPost.authorName)}
+                         className="flex items-center gap-1 px-4 py-2 bg-white text-gray-500 border border-gray-200 rounded hover:bg-gray-50 transition-colors font-medium text-sm"
+                       >
+                         <Ban size={16} /> 차단
+                       </button>
+                     )}
                    </div>
                 </div>
 
@@ -1096,12 +1151,12 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
                 <div className="mt-10 bg-gray-50 rounded-xl p-6 border border-gray-200">
                   <h3 className="text-gray-900 font-bold mb-4 flex items-center gap-2 text-lg">
                     <MessageSquare size={20} className="text-blue-600" />
-                    댓글 <span className="text-blue-600">{selectedPost.comments?.length || 0}</span>
+                    댓글 <span className="text-blue-600">{visibleComments.length}</span>
                   </h3>
 
                   {/* Comment List */}
                   <div className="space-y-3 mb-6">
-                    {selectedPost.comments?.map((comment) => (
+                    {visibleComments.map((comment) => (
                       <div key={comment.id} className="bg-white rounded-lg p-5 border border-gray-200 shadow-sm">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center gap-2">
@@ -1127,6 +1182,24 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
                               >
                                 삭제
                               </button>
+                            </div>
+                          )}
+                          {comment.authorId !== user?.id && !isAdmin && (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleReport({ postId: selectedPost.id, commentId: comment.id })}
+                                className="text-gray-400 hover:text-red-500 text-xs underline"
+                              >
+                                신고
+                              </button>
+                              {comment.authorId && (
+                                <button
+                                  onClick={() => handleBlock(comment.authorId, comment.authorName)}
+                                  className="text-gray-400 hover:text-red-500 text-xs underline"
+                                >
+                                  차단
+                                </button>
+                              )}
                             </div>
                           )}
                         </div>
@@ -1156,7 +1229,7 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
                         )}
                       </div>
                     ))}
-                    {(!selectedPost.comments || selectedPost.comments.length === 0) && (
+                    {visibleComments.length === 0 && (
                        <div className="text-center py-8 text-gray-400 text-sm">
                           첫 번째 댓글을 작성해보세요.
                        </div>
@@ -1283,6 +1356,8 @@ ${failedUploadMessage(failedFiles)}` : '게시글이 수정되었습니다.');
             </motion.div>
           )}
       </AnimatePresence>
+
+      {reportTarget && <ReportDialog target={reportTarget} onClose={() => setReportTarget(null)} />}
     </div>
   );
 }

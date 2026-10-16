@@ -78,6 +78,12 @@ export default function AIFactCheck() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Publishing is for members only: they accepted the terms at signup and can be reported/blocked
+    if (!user) {
+      if (confirm('자료 등록은 회원만 할 수 있습니다. 로그인하시겠습니까?')) navigate('/login');
+      return;
+    }
+
     if (!title.trim()) {
       alert('제목을 입력해주세요.');
       return;
@@ -92,7 +98,7 @@ export default function AIFactCheck() {
       const { failedFiles } = await archiveService.createPost(boardType, {
         title: title.trim(),
         content: content.trim(),
-        authorId: user?.id || 'guest',
+        authorId: user.id,
         authorName: authorName.trim() || '독도 가디언',
         visibility,
         files,
