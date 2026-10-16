@@ -69,7 +69,7 @@ Custom schema `dokdo_guardians` is used for total isolation:
 
 ## 5. Brand Assets & App Icons
 - **Design Motif**: Iconic Dokdo Island Twin Peaks on a Deep Ocean Blue Wave Bowl with Flying Seagulls and Proud South Korean Taegeukgi Flag (National Marine Heritage Vector Symbol).
-- **Master Assets**: `assets/icon.png` (1024x1024 PNG), `public/icon.png`, `public/favicon.png`.
+- **Master Assets**: `assets/icon.png` (1024x1024, opaque cream square with the Dokdo emblem, no transparency) = `public/icon.png` (web favicon / apple-touch-icon), plus `public/favicon.png`. The legacy Android launcher icons (`ic_launcher`, `ic_launcher_round`) and `play-store/icon-512.png` are derived from it.
 - **iOS AppIcon**: `ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png` (1024x1024 Universal).
 - **Android Launcher Icons**:
   - Legacy & Standard: `android/app/src/main/res/mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/ic_launcher.png`

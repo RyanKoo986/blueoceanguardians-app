@@ -79,7 +79,7 @@ function Header() {
 
   const getPageTitle = (pathname: string) => {
     if (pathname === '/about') return 'About';
-    if (pathname === '/services/cleanup') return '수중 정화 제보';
+    if (pathname === '/services/cleanup') return '수중정화 참여 신청';
     if (pathname === '/services/contest') return '수중사진 공모전';
     if (pathname === '/services/ai-fact-check') return 'AI 팩트체크';
     if (pathname === '/services/report') return '오류 정보 제보';

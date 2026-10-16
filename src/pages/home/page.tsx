@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HeroSection } from './components/HeroSection';
 import { ProductSection } from './components/ProductSection';
-import { AITrendSection } from './components/AITrendSection';
 import { AboutSection } from './components/AboutSection';
 import { ProjectsSection } from './components/ProjectsSection';
 import { ContactSection } from './components/ContactSection';
@@ -115,7 +114,6 @@ export default function HomePage() {
           <div className="relative z-10">
             <HeroSection />
             <AboutSection />
-            <AITrendSection />
             <div id="products">
               <ProductSection />
             </div>
