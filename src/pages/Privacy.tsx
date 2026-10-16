@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
 
 export const PrivacyPage: React.FC = () => {
@@ -133,6 +133,10 @@ export const PrivacyPage: React.FC = () => {
               <li><strong>남는 정보:</strong> 작성한 게시물·댓글은 작성자가 '탈퇴한 회원'으로 표시되어 남습니다. 삭제를 원하시면 탈퇴 전에 직접 삭제해 주세요.</li>
               <li><strong>보관되는 정보:</strong> 관계 법령에 따라 보존 의무가 있는 정보는 해당 기간 동안 보관 후 파기</li>
             </ul>
+            <p className="mt-3 text-slate-400">
+              로그인할 수 없는 경우의 삭제 요청과 일부 데이터만 삭제하는 방법은{' '}
+              <Link to="/account-deletion" className="text-blue-400 underline">계정 및 데이터 삭제 안내</Link>를 참고해 주세요.
+            </p>
           </section>
 
           <section>
